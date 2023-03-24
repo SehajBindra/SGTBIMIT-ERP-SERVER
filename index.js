@@ -11,14 +11,16 @@ app.get("/", function(req,res) {
 })
 
 
+//env 
+const dotenv = require('dotenv');
+dotenv.config();
+
+
 //database
 const dbConnect = require("./config/dbConfig");
 dbConnect();
 
 
-//env 
-const dotenv = require('dotenv');
-dotenv.config();
 
 
 app.use(express.json());
