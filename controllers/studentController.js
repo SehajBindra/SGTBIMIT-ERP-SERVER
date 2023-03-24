@@ -70,7 +70,7 @@ const StudentSigninController = async() => {
             return res.status(400).send({message : "You are not registered user pls register first"})
         }
         
-        
+
         const {Email, password} = req.body;
         if(!Email || !password) {
             return res.status(400).send({message : "All fields are required"});
@@ -95,4 +95,4 @@ const StudentSigninController = async() => {
     }
 }
 
-module.exports = {studentSignupController}
+module.exports = {studentSignupController, StudentSigninController}
