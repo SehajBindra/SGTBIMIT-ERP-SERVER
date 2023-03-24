@@ -1,17 +1,19 @@
-// const jwt = require("jsonwebtoken");
-
-// const auth = async (req, res, next) => {
-//   try {
-//     const token = req.headers.authorization.split(" ")[1];
-//     let decodedData;
-//     if (token) {
-//       decodedData = jwt.verify(token, "sEcReT");
-//       req.userId = decodedData?.id;
-//     }
-//     next();
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
-// module.exports = auth
+const express = require('express');
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
+const secretkey='secretkey';
+const app = express();
+function verifyToken(req,resp,next)
+{
+    const bearerHeader = req.headers['authorization'];
+    if(typeof bearerHeader !== 'undefined'){
+        const bearer = bearerHeader.split(" ");
+        const token = bearer[1];
+        req.token = token;
+        next();
+    }else{
+        resp.send({
+            result:'Token not valid'
+        })
+    }
+}
