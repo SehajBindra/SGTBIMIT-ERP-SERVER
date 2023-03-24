@@ -34,6 +34,11 @@ app.use(express.urlencoded({ limit: "100mb", extended: true }));
 const studentRoute = require("./routes/studentRoute");
 app.use("/api/Student", studentRoute);
 
+//faculty routes
+const facultyRoute = require("./routes/facultyRoute");
+app.use("/api/Faculty", facultyRoute);
+
+
 
 app.listen(PORT, function (error) {
     if (error) {
