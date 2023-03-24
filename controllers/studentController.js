@@ -101,4 +101,15 @@ const StudentSigninController = async(req,res) => {
     }
 }
 
-module.exports = {studentSignupController, StudentSigninController}
+
+const protectedRoute = async(req,res) => {
+    try {
+        
+        return res.send("protected route");
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports = {studentSignupController, StudentSigninController, protectedRoute};
