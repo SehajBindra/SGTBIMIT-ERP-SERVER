@@ -5,10 +5,15 @@ const PORT = process.env.PORT || 5000;
 
 
 
+
 // just for checking
 app.get("/", function(req,res) {
     return res.status(200).send("Everthing is working fine --");
 })
+
+//database
+const dbConnect = require("./config/dbConfig");
+dbConnect();
 
 
 //env 
