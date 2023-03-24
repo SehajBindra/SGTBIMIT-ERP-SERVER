@@ -3,6 +3,7 @@ const {comparePassword, hashPassword} = require("../middleware/authpassword");
 const emailValidator = require('email-validator');
 
 
+//register
 const studentSignupController = async(req,res) => {
     try {
         
@@ -59,5 +60,39 @@ const studentSignupController = async(req,res) => {
     }
 }
 
+
+//login
+const StudentSigninController = async() => {
+    try {
+        
+        const newUser = await studentModel.findOne({Email});
+        if (!newUser) {
+            return res.status(400).send({message : "You are not registered user pls register first"})
+        }
+        
+        
+        const {Email, password} = req.body;
+        if(!Email || !password) {
+            return res.status(400).send({message : "All fields are required"});
+        }
+
+
+        const match = await comparePassword(password, newUser.password);
+        if (!match) {
+            console.log(error);
+            return res.status(400).send({message : "Invalid password"});
+        }
+
+
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            success : false,
+            message : "error in login",
+            error,
+        });
+    }
+}
 
 module.exports = {studentSignupController}
