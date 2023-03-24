@@ -1,5 +1,6 @@
 const studentModel = require('../models/student');
 const {comparePassword, hashPassword} = require("../middleware/authpassword");
+const Jwt = require("jsonwebtoken");
 const emailValidator = require('email-validator');
 
 
@@ -62,26 +63,31 @@ const studentSignupController = async(req,res) => {
 
 
 //login
-const StudentSigninController = async() => {
+const StudentSigninController = async(req,res) => {
     try {
         
-        const newUser = await studentModel.findOne({Email});
-        if (!newUser) {
+        const {Email, password} = req.body;
+
+        const User = await studentModel.findOne({Email});
+        if (!User) {
             return res.status(400).send({message : "You are not registered user pls register first"})
         }
         
-
-        const {Email, password} = req.body;
         if(!Email || !password) {
             return res.status(400).send({message : "All fields are required"});
         }
 
-
-        const match = await comparePassword(password, newUser.password);
+        const match = await comparePassword(password, User.password);
         if (!match) {
-            console.log(error);
             return res.status(400).send({message : "Invalid password"});
         }
+
+        const token = await Jwt.sign({ _id: User._id }, process.env.JWT_SECRET, { expiresIn: "7d",});
+        return res.status(200).send({
+            message : "User Login successfully",
+            userID : User._id,
+            token,
+        });
 
 
 
