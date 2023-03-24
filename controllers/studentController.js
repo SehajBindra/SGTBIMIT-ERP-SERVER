@@ -1,12 +1,14 @@
 const studentModel = require('../models/student');
 const {comparePassword, hashPassword} = require("../middleware/authpassword");
+const emailValidator = require('email-validator');
+
 
 const studentSignupController = async(req,res) => {
     try {
         
         const {firstName,lastName,Email,password,phone,address} = req.body;
         
-        if (!firstName && !lastName && !Email && !password && !phone && !address) {
+        if (!firstName || !lastName || !Email || !password || !phone || !address) {
             return res.status(401).send({message : "All fields are required"});
         }
         if (firstName === lastName) {
@@ -18,6 +20,10 @@ const studentSignupController = async(req,res) => {
         if (password.length < 8) {
             return res.status(401).send({message : "password must be of min 8 characters"});
         }
+        if (!emailValidator.validate(Email)) {
+            return res.status(400).send({ message: "Email is not correct" });
+        }
+
 
         const oldUser = await studentModel.findOne({Email});
 
