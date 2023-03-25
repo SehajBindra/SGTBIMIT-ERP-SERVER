@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const student = new mongoose.Schema({
 
     firstName : {
@@ -31,9 +30,28 @@ const student = new mongoose.Schema({
         type : Number,
         default : 0,
     },
+    tokens: [
+        {
+            token:{
+                type: string,
+                required:true
+            }
+        }
+    ]
 },
     {timestamps : true,}
 );
+/////Generating tokens
+// student.method.verifyToken = asyncfuction () {
+//     // try {
+//         let token = jwt.sign(payload, secretkey, [options,callback])
+            // await this.save();
+            // return token;
+//     }
+//     // catch (err) {
+//         console.log(err);
+//     }
+// }
 
 const Student = mongoose.model("student", student);
 module.exports = Student;
