@@ -1,9 +1,9 @@
-const studentModel = require("../models/student");
 const facultyModel = require("../models/faculty");
+const adminModel = require("../models/admin");
 
 const isAdmin = async (req, res, next) => {
     try {
-      const user = await studentModel.findById(req.body._id);
+      const user = await adminModel.findById(req.body._id);
       if (user.role !== 2) {
         return res.status(401).send({
           success: false,
@@ -39,7 +39,7 @@ const isFaculty = async (req, res, next) => {
       res.status(401).send({
         success: false,
         error,
-        message: "Error in admin middelware",
+        message: "Error in faculty middelware",
       });
     }
   };

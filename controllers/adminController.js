@@ -19,7 +19,7 @@ const adminSignupController = async(req,res) => {
         }
 
 
-        const oldAdmin = await studentModel.findOne({Email});
+        const oldAdmin = await adminModel.findOne({Email});
 
         if (oldAdmin) {
             return res.status(401).send({message : "You are already admin kindly login"});

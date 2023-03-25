@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const facultySchema = new mongoose.Schema({
+const faculty = new mongoose.Schema({
 
     firstName : {
         type : String,
@@ -39,5 +39,5 @@ const facultySchema = new mongoose.Schema({
     {timestamps: true,}
 )
 
-const faculties = mongoose.model("facultySchema", facultySchema);
+const faculties = mongoose.model("faculty", faculty);
 module.exports = faculties;
