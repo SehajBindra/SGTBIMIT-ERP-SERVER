@@ -1,16 +1,16 @@
-const studentModel = require('../models/student');
+const facultyModel = require("../models/faculty");
+const emailValidator = require('email-validator');
 const {comparePassword, hashPassword} = require("../middleware/authpassword");
 const Jwt = require("jsonwebtoken");
-const emailValidator = require('email-validator');
-
 
 //register
-const studentSignupController = async(req,res) => {
+const facultySignupCintroller = async(req,res) => {
+
     try {
+
+        const {firstName,lastName,Email,password,phone,address,designation} = req.body;
         
-        const {firstName,lastName,Email,password,phone,address} = req.body;
-        
-        if (!firstName || !lastName || !Email || !password || !phone || !address) {
+        if (!firstName || !lastName || !Email || !password || !phone || !address || !designation) {
             return res.status(401).send({message : "All fields are required"});
         }
         if (firstName === lastName) {
@@ -27,7 +27,7 @@ const studentSignupController = async(req,res) => {
         }
 
 
-        const oldUser = await studentModel.findOne({Email});
+        const oldUser = await facultyModel.findOne({Email});
 
         if (oldUser) {
             return res.status(401).send({message : "You are already registered user kindly login"});
@@ -35,10 +35,11 @@ const studentSignupController = async(req,res) => {
 
         const hashedpassword = await hashPassword(password);
 
-        const user = await new studentModel({
+        const user = await new facultyModel({
             firstName,
             lastName,
             Email,
+            designation,
             password: hashedpassword,
             phone,
             address,
@@ -49,8 +50,8 @@ const studentSignupController = async(req,res) => {
             message : "User Register Successfully",
             user, 
         });
-
-
+        
+        
     } catch (error) {
         console.log(error);
         return res.status(500).send({
@@ -62,14 +63,16 @@ const studentSignupController = async(req,res) => {
 }
 
 
+
 //login
-const StudentSigninController = async(req,res) => {
+const facultySigninCintroller = async(req,res) => {
+
     try {
-        
+
         const {Email, password} = req.body;
 
-        const User = await studentModel.findOne({Email});
-        if (!User) {
+        const faculty = await facultyModel.findOne({Email});
+        if (!faculty) {
             return res.status(400).send({message : "You are not registered user pls register first"})
         }
         
@@ -77,39 +80,28 @@ const StudentSigninController = async(req,res) => {
             return res.status(400).send({message : "All fields are required"});
         }
 
-        const match = await comparePassword(password, User.password);
+        const match = await comparePassword(password, faculty.password);
         if (!match) {
             return res.status(400).send({message : "Invalid password"});
         }
 
-        const token = await Jwt.sign({ _id: User._id }, process.env.JWT_SECRET, { expiresIn: "7d",});
+        const token = await Jwt.sign({ _id: faculty._id }, process.env.JWT_SECRET, { expiresIn: "7d",});
         return res.status(200).send({
             message : "User Login successfully",
-            userID : User._id,
+            userID : faculty._id,
             token,
         });
 
-
-
+        
     } catch (error) {
         console.log(error);
         return res.status(500).send({
-            success : false,
-            message : "error in login",
+            success: false,
+            message : 'Error in Registration',
             error,
         });
     }
 }
 
 
-const protectedRoute = async(req,res) => {
-    try {
-        
-        return res.send("protected route");
-
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-module.exports = {studentSignupController, StudentSigninController, protectedRoute};
+module.exports = {facultySignupCintroller, facultySigninCintroller}
