@@ -33,7 +33,7 @@ const student = new mongoose.Schema({
     tokens: [
         {
             token:{
-                type: string,
+                type: {},
                 required:true
             }
         }
