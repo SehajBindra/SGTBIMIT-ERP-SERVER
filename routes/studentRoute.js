@@ -8,9 +8,6 @@ router.post("/Signup", studentSignupController);
 
 //login route
 router.post("/Signin", StudentSigninController)
-// try
-// {
-//     const {username, password} = req.body;
 
 //test
 router.get("/test", isAdmin, protectedRoute);
