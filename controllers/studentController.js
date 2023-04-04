@@ -2,6 +2,7 @@ const studentModel = require('../models/student');
 const {comparePassword, hashPassword} = require("../middleware/authpassword");
 const Jwt = require("jsonwebtoken");
 const emailValidator = require('email-validator');
+const validateOTP = require("../middleware/otpvalidation");
 
 
 //register
@@ -111,5 +112,75 @@ const protectedRoute = async(req,res) => {
         console.log(error);
     }
 }
+//OTP  Validation
+exports.forgotPassword = async (req, res, next) => {
+    try {
+      const { errors, isValid } = validateForgotPassword(req.body);
+      if (!isValid) {
+        return res.status(400).json(errors);
+      }
+  
+      const { email } = req.body;
+      const student = await Student.findOne({ email });
+  
+      if (!student) {
+        errors.email = "Email not found";
+        return res.status(400).json(errors);
+      }
+    function generateOTP() {
+      var digits = "0123456789";
+      let OTP = "";
+      for (let i = 0; i < 6; i++) {
+        OTP += digits[Math.floor(Math.random() * 10)];
+      }
 
+      return OTP;
+    }
+
+    const otp = generateOTP();
+    student.otp = otp;
+    await student.save();
+    await sendEmail(student.email, otp, "OTP");
+    res.status(200).json({ message: "Check your registered email for OTP" });
+
+    const helper = async () => {
+      student.otp = "";
+      await Student.save();
+    };
+
+    setTimeout(function () {
+      helper();
+    }, 3000);
+  } catch (err) {
+    console.log("Error in sending email", err.message);
+  }
+};
+
+exports.postOTP = async (req, res, next) => {
+  try {
+    const { errors, isValid } = validateOTP(req.body);
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    const { email, otp, newPassword, confirmNewPassword } = req.body;
+    if (newPassword !== confirmNewPassword) {
+      errors.confirmNewPassword = "Password Mismatch";
+      return res.status(400).json(errors);
+    }
+    const student = await Student.findOne({ email });
+    if (student.otp !== otp) {
+      errors.otp = "Invalid OTP, check your email again";
+      return res.status(400).json(errors);
+    }
+
+    let hashedPassword;
+    hashedPassword = await bcrypt.hash(newPassword, 10);
+    student.password = hashedPassword;
+    await student.save();
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (err) {
+    console.log("Error in submitting OTP", err.message);
+    return res.status(400).json({ message: "Error in submitting OTP" });
+  }
+};
 module.exports = {studentSignupController, StudentSigninController, protectedRoute};
