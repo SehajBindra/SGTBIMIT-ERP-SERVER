@@ -37,7 +37,10 @@ const student = new mongoose.Schema({
                 required:true
             }
         }
-    ]
+    ],
+    otp: {
+        type : string,
+    }
 },
     {timestamps : true,}
 );
