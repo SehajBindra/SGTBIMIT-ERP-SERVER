@@ -39,8 +39,8 @@ const facultyRoute = require("./routes/facultyRoute");
 app.use("/api/Faculty", facultyRoute);
 
 //admin routes
-const adminRoute = require("./routes/adminRoute");
-app.use("/api/Admin", adminRoute);
+const superadminRoute = require("./routes/superAdminRoute");
+app.use("/api/superAdmin", superadminRoute);
 
 
 

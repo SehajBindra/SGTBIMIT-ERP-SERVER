@@ -18,7 +18,7 @@ const admin = new mongoose.Schema({
         require : true,
     },
     contactNumber : {
-        type : String,
+        type : Number,
         require : true,
         unique : true,
     },

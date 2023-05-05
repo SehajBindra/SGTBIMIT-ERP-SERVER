@@ -7,7 +7,7 @@ const adminSignupController = async(req,res) => {
     try {
         
         const {name,Email,password,department,contactNumber} = req.body;
-        const avatar = req.file.filename;
+        const avatar = req.file;
 
         
         if (!name || !Email || !password ||!department || !contactNumber || !avatar) {

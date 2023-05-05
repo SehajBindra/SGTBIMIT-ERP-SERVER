@@ -41,7 +41,7 @@ const faculty = new mongoose.Schema({
     },
     role : {
         type : Number,
-        default : 0,
+        default : 2,
     },
 },
     {timestamps: true,}

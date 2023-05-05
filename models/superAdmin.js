@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const Admin = new mongoose.Schema({
+    
     name : {
         type : String,
         require: true,
@@ -18,7 +19,7 @@ const Admin = new mongoose.Schema({
         require : true,
     },
     contactNumber : {
-        type : String,
+        type : Number,
         require : true,
         unique : true,
     },
