@@ -80,8 +80,6 @@ const adminSigninController = async(req,res) => {
           return res.status(400).send({ message: "Invalid password" });
         }
         const token = await Jwt.sign({_id : Admin._id}, process.env.JWT_SECRET,  {expiresIn: "7d",})
-
-        
         return res.status(200).send({
             message : "Admin Login successfully",
             userID : Admin._id,
