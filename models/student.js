@@ -1,55 +1,103 @@
-const mongoose = require('mongoose');
-const student = new mongoose.Schema({
-
-    firstName : {
-        type : String,
-        require : true,
+const mongoose = require("mongoose");
+const student = new mongoose.Schema(
+  {
+    batch: {
+      type: Number,
+      required: true,
     },
-    lastName : {
-        type : String,
-        require : true,
+    fatherNumber: {
+      type: Number,
+      required: true,
     },
-    Email : {
-        type : String,
-        require : true,
-        unique : true,
+    section: {
+      type: String,
+      required: true,
     },
-    password : {
-        type : String,
-        require : true,
+    firstName: {
+      type: String,
+      required: true,
     },
-    phone : {
-        type : Number,
-        require : true,
+    lastName: {
+      type: String,
+      required: true,
     },
-    address : {
-        type : {},
-        require :true,
+    year: {
+      type: Number,
+      required: true,
     },
-    role : {
-        type : Number,
-        default : 0,
+    subjectsAndCode: {
+      type: [],
+      required: true,
+    },
+    department: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      required: true,
+    },
+    avatar: {
+      type: String,
+      required: true
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    motherName: {
+      type: String,
+      required: true,
+    },
+    fatherName: {
+      type: String,
+      required: true,
+    },
+    dob: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: Number,
+      required: true,
+    },
+    address: {
+      type: {},
+      required: true,
+    },
+    role: {
+      type: Number,
+      default: 0,
     },
     tokens: [
-        {
-            token:{
-                type: {},
-                required:true
-            }
-        }
+      {
+        token: {
+          type: {},
+          required: true,
+        },
+      },
     ],
     otp: {
-        type : String,
-    }
-},
-    {timestamps : true,}
+      type: String,
+    },
+  },
+  { timestamps: true }
 );
 /////Generating tokens
 // student.method.verifyToken = asyncfuction () {
 //     // try {
 //         let token = jwt.sign(payload, secretkey, [options,callback])
-            // await this.save();
-            // return token;
+// await this.save();
+// return token;
 //     }
 //     // catch (err) {
 //         console.log(err);

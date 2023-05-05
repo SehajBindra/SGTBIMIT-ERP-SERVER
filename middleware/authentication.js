@@ -1,7 +1,11 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
-const secretkey='secretkey';
+// const secretkey='secretkey';
+dotenv.config();
+const secretKey = process.env.JWT_SECRET;
+
+
 const app = express();
 function verifyToken(req,resp,next)
 {

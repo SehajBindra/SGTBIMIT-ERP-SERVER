@@ -1,13 +1,33 @@
 const express = require('express');
 const router = express.Router();
-const {studentSignupController, StudentSigninController, protectedRoute} = require("../controllers/studentController");
+const multer = require("multer");
+const {studentSignupController, studentSigninController, studentUpdateController, protectedRoute, studentRemoveController} = require("../controllers/studentController");
 const isAdmin = require("../middleware/authmiddleware");
 
-// register
-router.post("/Signup", studentSignupController);
+// File upload using multer
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'studentAvatars/')
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + '-' + file.originalname)
+    }
+  })
+  
+  const upload = multer({ storage: storage })
+  
 
-//login route
-router.post("/Signin", StudentSigninController)
+// register
+router.post("/Signup", upload.single('avatar'), studentSignupController);
+
+// login route
+router.post("/Signin", studentSigninController)
+
+// update route
+router.put("/edit/:id", studentUpdateController);
+
+// delete a student
+router.delete("/delete/:id", studentRemoveController)
 
 //test
 router.get("/test", isAdmin, protectedRoute);

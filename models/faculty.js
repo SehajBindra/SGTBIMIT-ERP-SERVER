@@ -10,6 +10,14 @@ const faculty = new mongoose.Schema({
         type : String,
         require : true,
     },
+    avatar: {
+        type: Object,
+        required: true
+    },
+    dob: {
+        type: Date,
+        required: true
+    },
     designation : {
         type : String,
         require : true,
