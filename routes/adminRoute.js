@@ -5,7 +5,7 @@ const {adminSigninController, adminSignupController} = require('../controllers/a
 
 
 //register
-router.post("/Signup", adminSignupController);
+router.post("/Signup",adminSignupController);
 
 
 //login
