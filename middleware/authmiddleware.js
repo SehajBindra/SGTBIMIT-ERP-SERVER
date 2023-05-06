@@ -4,7 +4,7 @@ const adminModel = require("../models/admin");
 
 const issuperAdmin = async (req, res, next) => {
     try {
-      const user = await superAdminModel.findById(req.body._id);
+      const user = await superAdminModel.findOne(req.body._id);
       if (user.role !== 0) {
         return res.status(401).send({
           success: false,
