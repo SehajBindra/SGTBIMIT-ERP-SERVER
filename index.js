@@ -38,11 +38,14 @@ app.use("/api/Student", studentRoute);
 const facultyRoute = require("./routes/facultyRoute");
 app.use("/api/Faculty", facultyRoute);
 
-//admin routes
+//Super admin routes
 const superadminRoute = require("./routes/superAdminRoute");
 app.use("/api/superAdmin", superadminRoute);
 
 
+//Admin Routes
+const AdminRoutes = require("./routes/adminRoute");
+app.use("/api/admin",AdminRoutes)
 
 app.listen(PORT, function (error) {
     if (error) {

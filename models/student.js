@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const student = new mongoose.Schema(
   {
     batch: {
-      type: Number,
+      type: String,
       required: true,
     },
     fatherNumber: {
@@ -25,10 +25,6 @@ const student = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    subjectsAndCode: {
-      type: [],
-      required: true,
-    },
     department: {
       type: String,
       required: true,
@@ -38,12 +34,9 @@ const student = new mongoose.Schema(
       required: true,
     },
     avatar: {
-      type: String,
-      required: true
-    },
-    username: {
-      type: String,
-      required: true,
+      data : Buffer,
+      contentType : String,
+      Name : String,
     },
     motherName: {
       type: String,
@@ -71,21 +64,25 @@ const student = new mongoose.Schema(
       required: true,
     },
     address: {
-      type: {},
+      type: String,
       required: true,
     },
     role: {
       type: Number,
       default: 3,
     },
-    tokens: [
-      {
-        token: {
-          type: {},
-          required: true,
-        },
-      },
-    ],
+    roll_Number : {
+      type : Number,
+      required : true
+    },
+    course :{
+      type : String,
+      required : true
+    },
+    semester : {
+      type : String,
+      required : true
+    },
     otp: {
       type: String,
     },

@@ -1,7 +1,9 @@
 const Jwt = require("jsonwebtoken");
-const emailValidator = require("email-validator");
 const { hashPassword, comparePassword } = require("../middleware/authpassword");
+const emailValidator = require("email-validator");
 const adminModel = require("../models/admin");
+const studentModel = require("../models/student");
+const fs = require('fs')
 
 const adminSignupController = async (req, res) => {
     try {
@@ -100,4 +102,97 @@ const adminSigninController = async (req, res) => {
 }
 
 
-module.exports = { adminSigninController, adminSignupController };
+const AdminStudentAdd = async (req, res) => {
+    try {
+        const {
+            fatherNumber,
+            section,
+            firstName,
+            lastName,
+            year,
+            department,
+            gender,
+            motherName,
+            fatherName,
+            dob,
+            email,
+            phone,
+            address,
+            roll_Number,
+            course,
+            semester
+        } = req.fields
+
+        const {avatar} = req.files;
+
+        if (
+            !firstName ||
+            !lastName ||
+            !email ||
+            !phone ||
+            !address ||
+            !fatherNumber ||
+            !section ||
+            !year ||
+            !department ||
+            !gender ||
+            !motherName ||
+            !fatherName ||
+            !dob ||
+            !roll_Number ||
+            !course ||
+            !semester
+        ) {
+            return res.status(401).send({ message: "All fields are required" });
+        }
+
+        if (avatar && avatar > 1000000) {
+            return res.status(401).send({ message: "Avatar size is 1Mb Required", success: false });
+        }
+
+        if (firstName === lastName) {
+            return res
+                .status(401)
+                .send({ message: "firstName and lastName should not be the same" });
+        }
+
+        if (phone.length > 10 || phone.length < 10) {
+            return res
+                .status(400)
+                .send({ message: "You have typed wrong phone number" });
+        }
+
+        if (!emailValidator.validate(email)) {
+            return res.status(400).send({ message: "Email is not correct" });
+        }
+
+        const StudentCheck = await studentModel.findOne({ roll_Number, email, phone });
+
+        if (StudentCheck) {
+            return res.status(401).send({ message: "Student Already registered", success: false })
+        } else {
+            const StudentDetails = await studentModel(req.fields);
+
+            if (avatar) {
+                StudentDetails.avatar.data = fs.readFileSync(avatar.path);
+                StudentDetails.avatar.contentType = avatar.type;
+                StudentDetails.avatar.Name = avatar.name;
+            }
+
+            const passwordCreate = roll_Number + firstName.toUpperCase();
+            // const hashedPassword = await hashPassword(passwordCreate);
+            StudentDetails.password = passwordCreate;
+            StudentDetails.batch = year;
+            StudentDetails.role = 3;
+
+            await StudentDetails.save();
+            return res.status(200).send({ message: "Student has been Created ", success: true })
+        }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+module.exports = { adminSigninController, adminSignupController, AdminStudentAdd };
