@@ -10,7 +10,7 @@ const facultySignupCintroller = async(req,res) => {
 
         const {firstName,lastName,Email,password,phone,address,designation} = req.body;
         
-        if (!firstName || !lastName || !Email || !password || !phone || !address || !designation) {
+        if (!firstName|| !lastName || !Email || !password || !phone || !address || !designation) {
             return res.status(401).send({message : "All fields are required"});
         }
         if (firstName === lastName) {
@@ -102,6 +102,58 @@ const facultySigninCintroller = async(req,res) => {
         });
     }
 }
+//facultyupdateController
+ const facultyupdateController = async(rq,res) => {
+    try {
+        const { firstName, Gender, lastName, dob, department, phone, address, avatar, email, designation } =
+          req.body;
+        const updatedFaculty = await Faculty.findOne({ facultyID });
+        if (firstName) {
+          updatedFaculty.firstName = firstName;
+          await updatedFaculty.save();
+        }
+        if (email) {
+            updatedFaculty.email = email;
+            await updatedFaculty.save();
+          }
+        if (Gender) {
+            updatedFaculty.Gender = Gender;
+            await updatedFaculty.save();
+        }
+        if (lastName) {
+            updatedFaculty.lastName = lastName;
+            await updatedFaculty.save();
+        }
+        if (dob) {
+          updatedFaculty.dob = dob;
+          await updatedFaculty.save();
+        }
+        if (department) {
+          updatedFaculty.department = department;
+          await updatedFaculty.save();
+        }
+        if (address) {
+            updatedFaculty.address = address;
+            await updatedFaculty.save();
+          }
+        if (phone) {
+          updatedFaculty.phone = phone;
+          await updatedFaculty.save();
+        }
+        if (designation) {
+          updatedFaculty.designation = designation;
+          await updatedFaculty.save();
+        }
+        if (avatar) {
+          updatedFaculty.avatar = avatar;
+          await updatedFaculty.save();
+        }
+        res.status(200).json(updatedFaculty);
+      } catch (error) {
+        const errors = { backendError: String };
+        errors.backendError = error;
+        res.status(500).json(errors);
+      }
+ }
 
-
-module.exports = {facultySignupCintroller, facultySigninCintroller}
+module.exports = {facultySignupCintroller, facultySigninCintroller, facultyupdateController}

@@ -10,6 +10,14 @@ const faculty = new mongoose.Schema({
         type : String,
         require : true,
     },
+    Gender : {
+        type : String,
+        require : true,
+    },
+    Join_year : {
+        type : Number,
+        require : true,
+    },
     avatar: {
         type: Object,
         required: true
