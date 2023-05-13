@@ -5,6 +5,7 @@ const adminModel = require("../models/admin");
 const studentModel = require("../models/student");
 const fs = require("fs");
 const xlsx = require("xlsx");
+const Semeters = require('../models/Semester');
 
 const adminSignupController = async (req, res) => {
   try {
@@ -106,12 +107,141 @@ const adminSigninController = async (req, res) => {
   }
 };
 
-const SemesterAdd = async (sem,course,section,_id) =>{
-    try {
-        
-    } catch (error) {
-        console.log(error);
+const SemesterAdd = async (sem, course, section, id) => {
+  try {
+
+    const SearchData = await Semeters.find();
+
+    console.log(typeof sem);
+
+    const SemesterResult = {
+      data: "",
+      result: false
     }
+
+    const CourseResult = {
+      data: "",
+      result: false
+    }
+
+    const SectionResult = {
+      data: "",
+      result: false
+    }
+
+    if (SearchData.length) {
+      // for(let i=0;i<SearchData.length;i++){
+        // if (SearchData[i].Sem.semNumber == sem.toString()) {
+        //   SemesterResult.data = SearchData[i];
+        //   SemesterResult.result = true;
+        // }
+      // }
+      SearchData.map((value) => {
+        // console.log(value);
+      if (value.Sem.semNumber == sem.toString()) {
+        SemesterResult.data = value;
+        SemesterResult.result = true;
+      }
+      })
+    } else {
+      await Semeters({
+        Sem: {
+          semNumber: sem,
+          Courses: [{
+            course: course,
+            Sections: [{
+              section: section,
+              StudentsIDs: [{
+                stu_id: id
+              }]
+            }]
+          }]
+        }
+      }).save()
+      return
+    }
+
+    if (SemesterResult.result) {
+      SemesterResult.data.Sem.Courses.map((value) => {
+        // console.log(value);
+        if (value.course === course) {
+          CourseResult.data = value;
+          CourseResult.result = true
+        }
+      })
+    } else {
+      await Semeters({
+        Sem: {
+          semNumber: sem,
+          Courses: [{
+            course: course,
+            Sections: [{
+              section: section,
+              StudentsIDs: [{
+                stu_id: id
+              }]
+            }]
+          }]
+        }
+      }).save()
+      return
+    }
+
+    if (CourseResult.result) {
+      // console.log(CourseResult.data.Sections);
+      CourseResult.data.Sections.map((value) => {
+        if (value.section === section) {
+          SectionResult.data = value;
+          SectionResult.result = true
+        }
+      })
+    } else {
+
+      await Semeters.updateOne({ "Sem.semNumber": sem }, {
+        $push: {
+          "Sem.Courses": {
+            course: course,
+            Sections: [{
+              section: section,
+              StudentsIDs: [{
+                stu_id: id
+              }]
+            }]
+          }
+        }
+      });
+
+      return
+      // console.log(data);
+    }
+
+
+    if (SectionResult.result) {
+// console.log("2");
+      await Semeters.updateOne({"Sem.semNumber" : sem, "Sem.Courses.course" : course, "Sem.Courses.Sections.section" : section},{
+        $push :{ "Sem.Courses.$[course].Sections.$[section].StudentsIDs" : [{
+          stu_id : id
+        }]}
+      },{arrayFilters : [{"course.course" : course},{"section.section" : section}]});
+      return
+      // console.log(data);
+    } else {
+      // console.log("1");
+       await Semeters.updateOne({"Sem.semNumber" : sem, "Sem.Courses.course" : course},{
+        $push : {"Sem.Courses.$[course].Sections" : [{
+          section : section,
+          StudentsIDs :[{
+            stu_id : id
+          }]
+        }] }
+      },{arrayFilters : [{"course.course" : course}]})
+
+     return
+    }
+
+  } catch (error) {
+    console.log(error); s
+  }
 }
 
 const MultipleStudentsAdd = async (req, res) => {
@@ -122,13 +252,14 @@ const MultipleStudentsAdd = async (req, res) => {
     const sheet = xlsxFile.Sheets[xlsxFile.SheetNames[0]];
     const P_Json = xlsx.utils.sheet_to_json(sheet);
 
-    console.log(P_Json[0]);
+    // console.log(P_Json[0].rollnumber);
+
 
     const RejectData = [];
 
     if (P_Json.length) {
       for (let i = 0; i < P_Json.length; i++) {
-        const SearchData = studentModel.findOne({
+        const SearchData = await studentModel.findOne({
           rollnumber: P_Json[i].rollnumber,
           email: P_Json[i].email,
           phone: P_Json[i].phone,
@@ -140,7 +271,7 @@ const MultipleStudentsAdd = async (req, res) => {
           await RejectData.push(P_Json[i]);
         } else {
           const StudentData = await studentModel({
-            fathernumber: P_Json[i].fathername,
+            fathernumber: P_Json[i].fathernumber,
             section: P_Json[i].section,
             firstname: P_Json[i].firstname,
             lastname: P_Json[i].lastname,
@@ -165,7 +296,8 @@ const MultipleStudentsAdd = async (req, res) => {
           StudentData.batch = P_Json[i].year;
           StudentData.role = 3;
 
-          await StudentData.save;
+          await SemesterAdd(P_Json[i].semester, P_Json[i].course, P_Json[i].section, StudentData._id)
+          await StudentData.save();
         }
       }
     }
@@ -275,7 +407,10 @@ const AdminStudentAdd = async (req, res) => {
       StudentDetails.batch = year;
       StudentDetails.role = 3;
 
-      await StudentDetails.save();
+      console.log(StudentDetails._id);
+
+      await SemesterAdd(semester, course, section, StudentDetails._id)
+      // await StudentDetails.save();
       return res
         .status(200)
         .send({ message: "Student has been Created ", success: true });
