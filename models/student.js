@@ -5,7 +5,7 @@ const student = new mongoose.Schema(
       type: String,
       required: true,
     },
-    fatherNumber: {
+    fathernumber: {
       type: Number,
       required: true,
     },
@@ -13,11 +13,11 @@ const student = new mongoose.Schema(
       type: String,
       required: true,
     },
-    firstName: {
+    firstname: {
       type: String,
       required: true,
     },
-    lastName: {
+    lastname: {
       type: String,
       required: true,
     },
@@ -38,11 +38,11 @@ const student = new mongoose.Schema(
       contentType : String,
       Name : String,
     },
-    motherName: {
+    mothername: {
       type: String,
       required: true,
     },
-    fatherName: {
+    fathername: {
       type: String,
       required: true,
     },
@@ -71,7 +71,7 @@ const student = new mongoose.Schema(
       type: Number,
       default: 3,
     },
-    roll_Number : {
+    rollnumber : {
       type : Number,
       required : true
     },
@@ -91,7 +91,7 @@ const student = new mongoose.Schema(
 );
 /////Generating tokens
 // student.method.verifyToken = asyncfuction () {
-//     // try {
+//     //s try {
 //         let token = jwt.sign(payload, secretkey, [options,callback])
 // await this.save();
 // return token;
