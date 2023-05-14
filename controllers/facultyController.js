@@ -2,6 +2,7 @@ const facultyModel = require("../models/faculty");
 const emailValidator = require('email-validator');
 const {comparePassword, hashPassword} = require("../middleware/authpassword");
 const Jwt = require("jsonwebtoken");
+const studentModel = require("../models/faculty");
 
 //register
 const facultySignupCintroller = async(req,res) => {
@@ -10,7 +11,13 @@ const facultySignupCintroller = async(req,res) => {
 
         const {firstName,lastName,Email,password,phone,address,designation} = req.body;
         
-        if (!firstName|| !lastName || !Email || !password || !phone || !address || !designation) {
+        if (!firstName||
+            !lastName || 
+            !Email || 
+            !password || 
+            !phone || 
+            !address || 
+            !designation) {
             return res.status(401).send({message : "All fields are required"});
         }
         if (firstName === lastName) {
@@ -156,4 +163,16 @@ const facultySigninCintroller = async(req,res) => {
       }
  }
 
-module.exports = {facultySignupCintroller, facultySigninCintroller, facultyupdateController}
+ const facultyRemoveController = async(rq,res) => {
+    try {
+        const deletefaculty = await facultyModel.findByIdAndDelete(req.facultyID);
+        if (!deletefaculty) {
+          return res.status(404).json({ message: 'Faculty not found' });
+        }
+        res.json({ message: 'Record deleted successfully', data: deletedfaculty });
+      } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ message: 'Internal server error' });
+      }
+ }
+module.exports = {facultySignupCintroller, facultySigninCintroller, facultyupdateController, facultyRemoveController}

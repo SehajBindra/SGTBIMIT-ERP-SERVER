@@ -14,16 +14,17 @@ const faculty = new mongoose.Schema({
         type : String,
         require : true,
     },
-    Join_year : {
+    Joinyear : {
         type : Number,
         require : true,
     },
     avatar: {
-        type: Object,
-        required: true
+        data : Buffer,
+        contentType : String,
+        Name : String,
     },
     dob: {
-        type: Date,
+        type: String,
         required: true
     },
     designation : {
