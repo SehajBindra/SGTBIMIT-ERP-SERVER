@@ -4,6 +4,7 @@ const emailValidator = require("email-validator");
 const adminModel = require("../models/admin");
 const studentModel = require("../models/student");
 const fs = require('fs')
+const facultyModel = require("../models/faculty");
 
 const adminSignupController = async (req, res) => {
     try {
@@ -172,27 +173,94 @@ const AdminStudentAdd = async (req, res) => {
             return res.status(401).send({ message: "Student Already registered", success: false })
         } else {
             const StudentDetails = await studentModel(req.fields);
-
             if (avatar) {
                 StudentDetails.avatar.data = fs.readFileSync(avatar.path);
                 StudentDetails.avatar.contentType = avatar.type;
                 StudentDetails.avatar.Name = avatar.name;
             }
-
             const passwordCreate = roll_Number + firstName.toUpperCase();
             // const hashedPassword = await hashPassword(passwordCreate);
             StudentDetails.password = passwordCreate;
             StudentDetails.batch = year;
             StudentDetails.role = 3;
-
             await StudentDetails.save();
             return res.status(200).send({ message: "Student has been Created ", success: true })
         }
-
     } catch (error) {
         console.log(error);
     }
 }
+const adminaddfaculty = async(req,res) => {
+    try{
+        const{
+            firstName,
+            lastName,
+            Gender,
+            Joinyear,
+            dob,
+            designation, 
+            Email,
+            phone,
+            address,
+            role
+        } = req.fields
+        const{avatar} = req.fields;
+        if(
+            !firstName||
+            !lastName||
+            !Gender||
+            !Joinyear||
+            !dob||
+            !designation|| 
+            !Email||
+            !phone||
+            !address||
+            !role
+        ){
+        return res
+        .status(401)
+        .send("All fields are required");
+    }
+        if(firstName == lastName){
+            return res
+            .status(400)
+            .send({ message: "firstName and lastName should not be the same" })
+        }
+        if (!emailValidator.validate(Email)) {
+            return res
+            .status(401)
+            .send({ message: "Email is not correct" });
+        }
+        // const facultycheck = await facultyModel({ Email })
+        // if(facultycheck){
+        //     return res
+        //     .status(400)    
+        //     .send({message:"Faculty already exist",success:false});
+        // }
+        else{
+        const facultydetails = await facultyModel(req.fields);
+        if (avatar) {
+            facultydetails.avatar.data = fs.readFileSync(avatar.path);
+            facultydetails.avatar.contentType = avatar.type;
+            facultydetails.avatar.Name = avatar.name;
+        }
+        const passwordCreate =  firstName.toUpperCase();
+        facultydetails.password = passwordCreate;
+        await facultydetails.save();
+        return res
+        .status(200)
+        .send({ message: "faculty has been Created ", success: true })
+        }
+    }
+    catch(Errors){
+        console.log(Errors);
+        return res
+        .status(500)
+        .send({
+            success: false,
+            message: "error in registration"
+        })
+    }
+}
 
-
-module.exports = { adminSigninController, adminSignupController, AdminStudentAdd };
+module.exports = { adminSigninController, adminSignupController, AdminStudentAdd, adminaddfaculty};
