@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const student = new mongoose.Schema(
+const studentSchema = new mongoose.Schema(
   {
     batch: {
       type: String,
@@ -101,5 +101,5 @@ const student = new mongoose.Schema(
 //     }
 // }
 
-const Student = mongoose.model("student", student);
+const Student = mongoose.model("student", studentSchema);
 module.exports = Student;

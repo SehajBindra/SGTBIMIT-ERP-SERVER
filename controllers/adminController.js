@@ -415,4 +415,4 @@ const AdminStudentAdd = async (req, res) => {
 }
 
 
-module.exports = { adminSigninController, adminSignupController, AdminStudentAdd };
+module.exports = { adminSigninController, adminSignupController, AdminStudentAdd ,MultipleStudentsAdd};

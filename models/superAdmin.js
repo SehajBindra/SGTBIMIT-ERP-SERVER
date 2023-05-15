@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const Admin = new mongoose.Schema({
+const SuperAdminSchema = new mongoose.Schema({
     
     name : {
         type : String,
@@ -35,5 +35,5 @@ const Admin = new mongoose.Schema({
 },  {timestamps : true,}
 );
 
-const superAdmin = mongoose.model("SuperAdmin", Admin);
+const superAdmin = mongoose.model("SuperAdmin", SuperAdminSchema);
 module.exports = superAdmin;

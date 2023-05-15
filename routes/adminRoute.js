@@ -14,4 +14,7 @@ router.post("/Signin", isAdmin, adminSigninController);
 //Student Register
 router.post("/Student_Add",formidable(), AdminStudentAdd);
 
+//Multiple Students Add 
+router.post("/Multiple_Student_Add",formidable(),MultipleStudentsAdd)
+
 module.exports = router;
