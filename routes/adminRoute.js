@@ -1,12 +1,8 @@
 const express =  require('express');
 const router = express.Router();
 const isAdmin = require('../middleware/authmiddleware');
-const {adminSigninController, adminSignupController,AdminStudentAdd,MultipleStudentsAdd,adminaddfaculty} = require('../controllers/adminController');
+const {adminSigninController,AdminStudentAdd,MultipleStudentsAdd,FacultyAdd} = require('../controllers/adminController');
 const formidable = require('express-formidable');
-
-//register
-router.post("/Signup",adminSignupController);
-
 
 //login
 router.post("/Signin", isAdmin, adminSigninController);
@@ -16,5 +12,8 @@ router.post("/Student_Add",formidable(), AdminStudentAdd);
 
 //Multiple Students Add 
 router.post("/Multiple_Student_Add",formidable(),MultipleStudentsAdd)
+
+//Faculty Add 
+router.post("/Faculty_Add",formidable(),FacultyAdd);
 
 module.exports = router;

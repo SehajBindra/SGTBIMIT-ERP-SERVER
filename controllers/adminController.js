@@ -8,69 +8,69 @@ const xlsx = require("xlsx");
 const Semeters = require('../models/Semester');
 const facultyModel = require("../models/faculty");
 
-const adminSignupController = async (req, res) => {
-  try {
-    const { name, Email, password, department, contactNumber } = req.fields;
-    const avatar = req.files;
+// const adminSignupController = async (req, res) => {
+//   try {
+//     const { name, Email, password, department, contactNumber } = req.fields;
+//     const avatar = req.files;
 
-    if (
-      !name ||
-      !Email ||
-      !password ||
-      !department ||
-      !contactNumber ||
-      !avatar
-    ) {
-      return res.status(401).send({ message: "All fields are required" });
-    }
-    if (password.length < 8) {
-      return res
-        .status(401)
-        .send({ message: "password must be of min 8 characters" });
-    }
-    if (contactNumber.length > 10 || contactNumber.length < 10) {
-      return res
-        .status(400)
-        .send({ message: "You have typed wrong phone number" });
-    }
-    if (!emailValidator.validate(Email)) {
-      return res.status(400).send({ message: "Email is not correct" });
-    }
+//     if (
+//       !name ||
+//       !Email ||
+//       !password ||
+//       !department ||
+//       !contactNumber ||
+//       !avatar
+//     ) {
+//       return res.status(401).send({ message: "All fields are required" });
+//     }
+//     if (password.length < 8) {
+//       return res
+//         .status(401)
+//         .send({ message: "password must be of min 8 characters" });
+//     }
+//     if (contactNumber.length > 10 || contactNumber.length < 10) {
+//       return res
+//         .status(400)
+//         .send({ message: "You have typed wrong phone number" });
+//     }
+//     if (!emailValidator.validate(Email)) {
+//       return res.status(400).send({ message: "Email is not correct" });
+//     }
 
-    const oldAdmin = await adminModel.findOne({ Email });
+//     const oldAdmin = await adminModel.findOne({ Email });
 
-    if (oldAdmin) {
-      return res
-        .status(401)
-        .send({ message: "You are already admin kindly login" });
-    }
+//     if (oldAdmin) {
+//       return res
+//         .status(401)
+//         .send({ message: "You are already admin kindly login" });
+//     }
 
-    const hashedpassword = await hashPassword(password);
+//     const hashedpassword = await hashPassword(password);
 
-    const user = await new adminModel({
-      name,
-      Email,
-      password: hashedpassword,
-      department,
-      contactNumber,
-      avatar,
-      role,
-    }).save();
+//     const user = await new adminModel({
+//       name,
+//       Email,
+//       password: hashedpassword,
+//       department,
+//       contactNumber,
+//       avatar,
+//       role,
+//     }).save();
 
-    return res.status(200).send({
-      success: true,
-      message: "Admin Register Successfully",
-      user,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({
-      success: false,
-      message: "Error in Registration",
-      error,
-    });
-  }
-};
+//     return res.status(200).send({
+//       success: true,
+//       message: "Admin Register Successfully",
+//       user,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).send({
+//       success: false,
+//       message: "Error in Registration",
+//       error,
+//     });
+//   }
+// };
 
 const adminSigninController = async (req, res) => {
   try {
@@ -132,17 +132,17 @@ const SemesterAdd = async (sem, course, section, id) => {
 
     if (SearchData.length) {
       // for(let i=0;i<SearchData.length;i++){
-        // if (SearchData[i].Sem.semNumber == sem.toString()) {
-        //   SemesterResult.data = SearchData[i];
-        //   SemesterResult.result = true;
-        // }
+      // if (SearchData[i].Sem.semNumber == sem.toString()) {
+      //   SemesterResult.data = SearchData[i];
+      //   SemesterResult.result = true;
+      // }
       // }
       SearchData.map((value) => {
         // console.log(value);
-      if (value.Sem.semNumber == sem.toString()) {
-        SemesterResult.data = value;
-        SemesterResult.result = true;
-      }
+        if (value.Sem.semNumber == sem.toString()) {
+          SemesterResult.data = value;
+          SemesterResult.result = true;
+        }
       })
     } else {
       await Semeters({
@@ -218,26 +218,30 @@ const SemesterAdd = async (sem, course, section, id) => {
 
 
     if (SectionResult.result) {
-// console.log("2");
-      await Semeters.updateOne({"Sem.semNumber" : sem, "Sem.Courses.course" : course, "Sem.Courses.Sections.section" : section},{
-        $push :{ "Sem.Courses.$[course].Sections.$[section].StudentsIDs" : [{
-          stu_id : id
-        }]}
-      },{arrayFilters : [{"course.course" : course},{"section.section" : section}]});
+      // console.log("2");
+      await Semeters.updateOne({ "Sem.semNumber": sem, "Sem.Courses.course": course, "Sem.Courses.Sections.section": section }, {
+        $push: {
+          "Sem.Courses.$[course].Sections.$[section].StudentsIDs": [{
+            stu_id: id
+          }]
+        }
+      }, { arrayFilters: [{ "course.course": course }, { "section.section": section }] });
       return
       // console.log(data);
     } else {
       // console.log("1");
-       await Semeters.updateOne({"Sem.semNumber" : sem, "Sem.Courses.course" : course},{
-        $push : {"Sem.Courses.$[course].Sections" : [{
-          section : section,
-          StudentsIDs :[{
-            stu_id : id
+      await Semeters.updateOne({ "Sem.semNumber": sem, "Sem.Courses.course": course }, {
+        $push: {
+          "Sem.Courses.$[course].Sections": [{
+            section: section,
+            StudentsIDs: [{
+              stu_id: id
+            }]
           }]
-        }] }
-      },{arrayFilters : [{"course.course" : course}]})
+        }
+      }, { arrayFilters: [{ "course.course": course }] })
 
-     return
+      return
     }
 
   } catch (error) {
@@ -388,31 +392,80 @@ const AdminStudentAdd = async (req, res) => {
       phone,
     });
 
-        if (StudentCheck) {
-            return res.status(401).send({ message: "Student Already registered", success: false })
-        } else {
-            const StudentDetails = await studentModel(req.fields);
+    if (StudentCheck) {
+      return res.status(401).send({ message: "Student Already registered", success: false })
+    } else {
+      const StudentDetails = await studentModel(req.fields);
 
-            if (avatar) {
-                StudentDetails.avatar.data = fs.readFileSync(avatar.path);
-                StudentDetails.avatar.contentType = avatar.type;
-                StudentDetails.avatar.Name = avatar.name;
-            }
+      if (avatar) {
+        StudentDetails.avatar.data = fs.readFileSync(avatar.path);
+        StudentDetails.avatar.contentType = avatar.type;
+        StudentDetails.avatar.Name = avatar.name;
+      }
 
-            const passwordCreate = roll_Number + firstName.toUpperCase();
-            // const hashedPassword = await hashPassword(passwordCreate);
-            StudentDetails.password = passwordCreate;
-            StudentDetails.batch = year;
-            StudentDetails.role = 3;
+      const passwordCreate = roll_Number + firstName.toUpperCase();
+      const hashedPassword = await hashPassword(passwordCreate);
+      StudentDetails.password = hashedPassword;
+      StudentDetails.batch = year;
+      StudentDetails.role = 3;
 
-            await StudentDetails.save();
-            return res.status(200).send({ message: "Student has been Created ", success: true })
-        }
-
-    } catch (error) {
-        console.log(error);
+      await StudentDetails.save();
+      return res.status(200).send({ message: "Student has been Created ", success: true })
     }
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const FacultyAdd = async (req, res) => {
+  try {
+    const { firstName,lastname,Gender,Joinyear,dob,designation,Email,phone,address,Category} = req.fields;
+    const { avatar } = req.files;
+
+    if (!firstName || !lastname || !Gender || !Joinyear ||!dob || !designation || !Email || !password || !phone || !address ||!Category) {
+      return res.status(401).send({ message: "All fields are required" });
+    }
+    if (password.length < 8) {
+      return res.status(401).send({ message: "password must be of min 8 characters" });
+    }
+    if (contactNumber.length > 10 || contactNumber.length < 10) {
+      return res.status(400).send({ message: "You have typed wrong phone number" });
+    }
+    if (!emailValidator.validate(Email)) {
+      return res.status(400).send({ message: "Email is not correct" });
+    }
+    if(avatar && avatar.size < 1000000){
+      return res.status(400).send({message : "Avatar Size required 1Mb only"})
+    }
+
+    const DataCheck = await facultyModel.findOne({Email,phone});
+
+    if(!DataCheck){
+      const FacultyData = await facultyModel(req.fields);
+
+      if(avatar){
+        FacultyData.avatar.data = fs.readFileSync(avatar.path);
+        FacultyData.avatar.contentType = avatar.type;
+        FacultyData.avatar.Name = avatar.name;
+      };
+
+      switch(Category){
+        case Teacher : FacultyData.role = 3
+      }
+
+      const passwordCreate = phone + firstName;
+      const hashedPassword = await hashPassword(passwordCreate);
+      FacultyData.password = hashedPassword;
+
+
+      await FacultyData.save()
+      return res.status(200).send({message : "Account has been Created"})
+    }
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 
-module.exports = { adminSigninController, adminSignupController, AdminStudentAdd ,MultipleStudentsAdd};
+module.exports = { adminSigninController, AdminStudentAdd, MultipleStudentsAdd,FacultyAdd };
