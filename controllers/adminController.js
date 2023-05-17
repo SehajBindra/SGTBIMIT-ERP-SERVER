@@ -340,8 +340,8 @@ const AdminStudentAdd = async (req, res) => {
         StudentDetails.avatar.Name = avatar.name;
       }
 
-      const passwordCreate = roll_Number + firstName.toUpperCase();
-      const hashedPassword = await hashPassword(passwordCreate);
+      const passwordCreate = rollnumber + firstname.toUpperCase();
+      const hashedPassword = await hashPassword(passwordCreate.toString());
       StudentDetails.password = hashedPassword;
       StudentDetails.batch = year;
       StudentDetails.role = 3;
@@ -357,19 +357,17 @@ const AdminStudentAdd = async (req, res) => {
 
 const FacultyAdd = async (req, res) => {
   try {
-    const { firstName,lastname,Gender,Joinyear,dob,designation,Email,phone,address,Category} = req.fields;
+    const { firstName,lastname,Gender,Joinyear,dob,designation,email,phone,address,Category} = req.fields;
     const { avatar } = req.files;
 
-    if (!firstName || !lastname || !Gender || !Joinyear ||!dob || !designation || !Email || !password || !phone || !address ||!Category) {
+    if (!firstName || !lastname || !Gender || !Joinyear ||!dob || !designation || !email || !phone || !address ||!Category) {
       return res.status(401).send({ message: "All fields are required" });
     }
-    if (password.length < 8) {
-      return res.status(401).send({ message: "password must be of min 8 characters" });
-    }
-    if (contactNumber.length > 10 || contactNumber.length < 10) {
+  
+    if (phone.length > 10 || phone.length < 10) {
       return res.status(400).send({ message: "You have typed wrong phone number" });
     }
-    if (!emailValidator.validate(Email)) {
+    if (!emailValidator.validate(email)) {
       return res.status(400).send({ message: "Email is not correct" });
     }
     if(avatar && avatar.size < 1000000){
@@ -388,10 +386,11 @@ const FacultyAdd = async (req, res) => {
       };
 
       switch(Category){
-        case Teacher : FacultyData.role = 3
+        case "Teacher" : FacultyData.role = 3
       }
 
       const passwordCreate = phone + firstName;
+      console.log(passwordCreate);
       const hashedPassword = await hashPassword(passwordCreate);
       FacultyData.password = hashedPassword;
 

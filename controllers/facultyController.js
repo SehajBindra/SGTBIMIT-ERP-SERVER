@@ -10,14 +10,15 @@ const facultySigninCintroller = async(req,res) => {
 
     try {
 
-        const {Email, password} = req.body;
+        const {email, password} = req.body;
 
-        const faculty = await facultyModel.findOne({Email});
+        const faculty = await facultyModel.findOne({email});
+        console.log(faculty);
         if (!faculty) {
             return res.status(400).send({message : "You are not registered user pls register first"})
         }
         
-        if(!Email || !password) {
+        if(!email || !password) {
             return res.status(400).send({message : "All fields are required"});
         }
 
@@ -27,6 +28,7 @@ const facultySigninCintroller = async(req,res) => {
         }
 
         const token = await Jwt.sign({ _id: faculty._id }, process.env.JWT_SECRET, { expiresIn: "7d",});
+        console.log(token);
         return res.status(200).send({
             message : "User Login successfully",
             userID : faculty._id,
