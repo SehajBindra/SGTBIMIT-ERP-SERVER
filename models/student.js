@@ -5,7 +5,7 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    fatherNumber: {
+    fathernumber: {
       type: Number,
       required: true,
     },
@@ -13,11 +13,11 @@ const studentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    firstName: {
+    firstname: {
       type: String,
       required: true,
     },
-    lastName: {
+    lastname: {
       type: String,
       required: true,
     },
@@ -38,11 +38,11 @@ const studentSchema = new mongoose.Schema(
       contentType : String,
       Name : String,
     },
-    motherName: {
+    mothername: {
       type: String,
       required: true,
     },
-    fatherName: {
+    fathername: {
       type: String,
       required: true,
     },
@@ -53,7 +53,6 @@ const studentSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
     },
     password: {
       type: String,
@@ -69,9 +68,9 @@ const studentSchema = new mongoose.Schema(
     },
     role: {
       type: Number,
-      default: 3,
+      default: 2,
     },
-    roll_Number : {
+    rollnumber : {
       type : Number,
       required : true
     },

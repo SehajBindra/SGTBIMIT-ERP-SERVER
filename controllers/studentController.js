@@ -3,121 +3,8 @@ const { comparePassword, hashPassword } = require("../middleware/authpassword");
 const Jwt = require("jsonwebtoken");
 const emailValidator = require("email-validator");
 const validateOTP = require("../middleware/otpvalidation");
+const Semester = require("../models/Semester");
 
-//register
-const studentSignupController = async (req, res) => {
-  try {
-    const {
-      batch,
-      fatherNumber,
-      section,
-      firstName,
-      lastName,
-      year,
-      subjectsAndCode,
-      department,
-      gender,
-      username,
-      motherName,
-      fatherName,
-      dob,
-      email,
-      password,
-      phone,
-      address,
-      role,
-    } = req.body;
-
-    const avatar = req.file.filename;
-
-    if (
-      !firstName ||
-      !lastName ||
-      !email ||
-      !password ||
-      !phone ||
-      !address ||
-      !batch ||
-      !fatherNumber ||
-      !section ||
-      !year ||
-      !subjectsAndCode ||
-      !department ||
-      !gender ||
-      !avatar ||
-      !username ||
-      !motherName ||
-      !fatherName ||
-      !dob
-    ) {
-      return res.status(401).send({ message: "All fields are required" });
-    }
-
-    if (firstName === lastName) {
-      return res
-        .status(401)
-        .send({ message: "firstName and lastName should not be the same" });
-    }
-    if (phone.length > 10 || phone.length < 10) {
-      return res
-        .status(400)
-        .send({ message: "You have typed wrong phone number" });
-    }
-    if (password.length < 8) {
-      return res
-        .status(401)
-        .send({ message: "password must be of min 8 characters" });
-    }
-    if (!emailValidator.validate(email)) {
-      return res.status(400).send({ message: "Email is not correct" });
-    }
-
-    const oldUser = await studentModel.findOne({ email });
-
-    if (oldUser) {
-      return res
-        .status(401)
-        .send({ message: "You are already registered user kindly login" });
-    }
-
-    const hashedpassword = await hashPassword(password);
-
-    const user = await new studentModel({
-      batch,
-      fatherNumber,
-      section,
-      firstName,
-      lastName,
-      year,
-      subjectsAndCode,
-      department,
-      gender,
-      avatar,
-      username,
-      motherName,
-      fatherName,
-      dob,
-      email,
-      password: hashedpassword,
-      phone,
-      address,
-      role,
-    }).save();
-
-    return res.status(200).send({
-      success: true,
-      message: "User Register Successfully",
-      user,
-    });
-  } catch (error) {
-    console.log(error);
-    return res.status(500).send({
-      success: false,
-      message: "Error in Registration",
-      error,
-    });
-  }
-};
 
 //login
 const studentSigninController = async (req, res) => {
@@ -160,6 +47,9 @@ const studentSigninController = async (req, res) => {
   }
 };
 
+
+
+
 // Update student
 const studentUpdateController = async (req, res) => {
   try {
@@ -175,7 +65,7 @@ const studentUpdateController = async (req, res) => {
       return res.status(401).json({ message: 'Invalid password' });
     }
 
-    const updatedStudentData =  await studentModel.findByIdAndUpdate(studentId, req.body, { new: true })
+    const updatedStudentData = await studentModel.findByIdAndUpdate(studentId, req.body, { new: true })
 
     res.json(updatedStudentData);
   } catch (error) {
@@ -185,27 +75,8 @@ const studentUpdateController = async (req, res) => {
 
 };
 
-// Delete a student
-const studentRemoveController = async (req, res) => {
-  try {
-    const deletedStudent = await studentModel.findByIdAndDelete(req.params.id);
-    if (!deletedStudent) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
-    res.json({ message: 'Record deleted successfully', data: deletedStudent });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-}
 
-const protectedRoute = async (req, res) => {
-  try {
-    return res.send("protected route");
-  } catch (error) {
-    console.log(error);
-  }
-};
+
 //OTP  Validation
 exports.forgotPassword = async (req, res, next) => {
   try {
@@ -277,10 +148,10 @@ exports.postOTP = async (req, res, next) => {
     return res.status(400).json({ message: "Error in submitting OTP" });
   }
 };
+
+
 module.exports = {
-  studentSignupController,
   studentSigninController,
   studentUpdateController,
-  studentRemoveController,
-  protectedRoute,
+ 
 };

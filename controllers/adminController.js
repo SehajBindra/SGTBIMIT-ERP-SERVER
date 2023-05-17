@@ -8,69 +8,6 @@ const xlsx = require("xlsx");
 const Semeters = require('../models/Semester');
 const facultyModel = require("../models/faculty");
 
-// const adminSignupController = async (req, res) => {
-//   try {
-//     const { name, Email, password, department, contactNumber } = req.fields;
-//     const avatar = req.files;
-
-//     if (
-//       !name ||
-//       !Email ||
-//       !password ||
-//       !department ||
-//       !contactNumber ||
-//       !avatar
-//     ) {
-//       return res.status(401).send({ message: "All fields are required" });
-//     }
-//     if (password.length < 8) {
-//       return res
-//         .status(401)
-//         .send({ message: "password must be of min 8 characters" });
-//     }
-//     if (contactNumber.length > 10 || contactNumber.length < 10) {
-//       return res
-//         .status(400)
-//         .send({ message: "You have typed wrong phone number" });
-//     }
-//     if (!emailValidator.validate(Email)) {
-//       return res.status(400).send({ message: "Email is not correct" });
-//     }
-
-//     const oldAdmin = await adminModel.findOne({ Email });
-
-//     if (oldAdmin) {
-//       return res
-//         .status(401)
-//         .send({ message: "You are already admin kindly login" });
-//     }
-
-//     const hashedpassword = await hashPassword(password);
-
-//     const user = await new adminModel({
-//       name,
-//       Email,
-//       password: hashedpassword,
-//       department,
-//       contactNumber,
-//       avatar,
-//       role,
-//     }).save();
-
-//     return res.status(200).send({
-//       success: true,
-//       message: "Admin Register Successfully",
-//       user,
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return res.status(500).send({
-//       success: false,
-//       message: "Error in Registration",
-//       error,
-//     });
-//   }
-// };
 
 const adminSigninController = async (req, res) => {
   try {
@@ -467,5 +404,41 @@ const FacultyAdd = async (req, res) => {
   }
 }
 
+const StuDeleteInSem = async (Sem, cour, sect, id) => {
+  try {
+    const Datafind = await Semester.findOne({ "Sem.Courses.Sections.StudentsIDs.stu_id": id });
+    if (Datafind) {
+     const data =  await Semester.updateOne({"Sem.semNumber" : Sem, "Sem.Courses.Sections.StudentsIDs.stu_id": id },{$pull : {
+        "Sem.Courses.$[course].Sections.$[section].StudentsIDs" : {
+          stu_id : id
+        }
+      }},{arrayFilters : [{"course.course":cour},{"section.section" : sect}]});
 
-module.exports = { adminSigninController, AdminStudentAdd, MultipleStudentsAdd,FacultyAdd };
+      console.log(data);
+      return
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+//---------------Student Delete Route-------------------- //
+
+const StudentDelete = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const studentData = await studentModel.findById(_id).select("-avatar");
+
+    if (studentData) {
+      await StuDeleteInSem(studentData.semester, studentData.course, studentData.section, studentData._id)
+      await studentModel.findByIdAndDelete(_id);
+      return res.send({message : "Data is delete", data : studentData})
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+module.exports = { adminSigninController, AdminStudentAdd, MultipleStudentsAdd,FacultyAdd,StudentDelete };

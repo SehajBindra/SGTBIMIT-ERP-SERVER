@@ -24,6 +24,8 @@ const adminModel = require("../models/admin");
 //   };
 
 
+
+
 const isAdmin = async (req, res, next) => {
     try {
       const user = await facultyModel.findById(req.body._id);
