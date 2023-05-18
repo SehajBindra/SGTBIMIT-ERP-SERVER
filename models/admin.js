@@ -5,7 +5,7 @@ const admin = new mongoose.Schema({
         type: String,
         require: true,
     },
-    Email: {
+    email: {
         type: String,
         require: true,
     },
