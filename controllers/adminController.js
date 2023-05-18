@@ -11,12 +11,12 @@ const facultyModel = require("../models/faculty");
 
 const adminSigninController = async (req, res) => {
   try {
-    const { Email, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!Email || !password) {
+    if (!email || !password) {
       return res.status(400).send({ message: "all fields are reuiqred" });
     }
-    const Admin = await adminModel.findOne({ Email });
+    const Admin = await adminModel.findOne({ email });
     if (!Admin) {
       return res
         .status(400)

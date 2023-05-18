@@ -16,7 +16,9 @@ router.get("/superAdmin-avatardisplay",verifyToken,isSuperAdmin, displaysuperava
 router.post("/Admin-create",verifyToken,isSuperAdmin,formidable(), adminCreateController);
 
 
-
+router.get("/Super_Admin-auth",verifyToken,isSuperAdmin, (req,res) =>{
+    return res.status(200).send({ok : true});
+})
 
 
 module.exports = router;
