@@ -19,4 +19,6 @@ router.post("/Faculty_Add",verifyToken,isAdminsRoleCheck,formidable(),FacultyAdd
 //Student Delete 
 router.delete("/Student_Delete/:_id",verifyToken,isAdminsRoleCheck,StudentDelete)
 
+
+
 module.exports = router;

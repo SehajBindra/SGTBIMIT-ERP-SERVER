@@ -81,8 +81,7 @@ const isAdminsRoleCheck = async (req, res, next) => {
 
 const isFaculty = async (req,res,next) =>{
     try {
-        const user = await Faculty.findById(req.user._id).select("password");
-
+        const user = await Faculty.findById(req.user._id).select("-password");
         if(user.role == 3){
             next()
         }else{

@@ -341,10 +341,10 @@ const AdminStudentAdd = async (req, res) => {
       }
 
       const passwordCreate = rollnumber + firstname.toUpperCase();
+      console.log(passwordCreate);
       const hashedPassword = await hashPassword(passwordCreate.toString());
       StudentDetails.password = hashedPassword;
       StudentDetails.batch = year;
-      StudentDetails.role = 3;
 
       await StudentDetails.save();
       return res.status(200).send({ message: "Student has been Created ", success: true })
@@ -374,7 +374,7 @@ const FacultyAdd = async (req, res) => {
       return res.status(400).send({message : "Avatar Size required 1Mb only"})
     }
 
-    const DataCheck = await facultyModel.findOne({Email,phone});
+    const DataCheck = await facultyModel.findOne({email,phone});
 
     if(!DataCheck){
       const FacultyData = await facultyModel(req.fields);
