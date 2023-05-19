@@ -34,6 +34,7 @@ const adminSigninController = async (req, res) => {
       message: "Admin Login successfully",
       userID: Admin._id,
       Name: Admin.name,
+      role : Admin.role,
       token,
     });
   } catch (error) {
