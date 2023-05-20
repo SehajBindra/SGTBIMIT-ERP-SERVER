@@ -4,7 +4,7 @@ const SubjectSchema = new mongoose.Schema({
     Course: String,
     Sem: [
         {
-            semNumber: String,
+            semNumber: Number,
             Subjects: {
                 Default: [
                     {
