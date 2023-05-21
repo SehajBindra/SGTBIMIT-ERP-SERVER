@@ -85,6 +85,12 @@ const studentSchema = new mongoose.Schema(
     otp: {
       type: String,
     },
+    Subjects :{
+      default : [
+        {type : mongoose.Schema.Types.ObjectId,
+          ref : "Subject"}
+      ]
+    }
   },
   { timestamps: true }
 );

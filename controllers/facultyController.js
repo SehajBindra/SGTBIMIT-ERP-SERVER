@@ -46,7 +46,7 @@ const facultySigninCintroller = async(req,res) => {
     }
 }
 //facultyupdateController
- const facultyupdateController = async(rq,res) => {
+ const facultyupdateController = async(req,res) => {
     try {
         const { firstName, Gender, lastName, dob, department, phone, address, avatar, email, designation } =
           req.body;
@@ -99,7 +99,7 @@ const facultySigninCintroller = async(req,res) => {
       }
  }
 
- const facultyRemoveController = async(rq,res) => {
+ const facultyRemoveController = async(req,res) => {
     try {
         const deletefaculty = await facultyModel.findByIdAndDelete(req.facultyID);
         if (!deletefaculty) {
