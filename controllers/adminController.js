@@ -371,6 +371,8 @@ const AdminStudentAdd = async (req, res) => {
         })
       }
 
+      await SemesterAdd(semester, course,section, StudentDetails._id)
+
       await StudentDetails.save();
       return res.status(200).send({ message: "Student has been Created ", success: true })
     }
@@ -457,7 +459,6 @@ const StudentDelete = async (req, res) => {
     const studentData = await studentModel.findById(_id).select("-avatar");
 
     if (studentData) {
-      await StuDeleteInSem(studentData.semester, studentData.course, studentData.section, studentData._id)
       await studentModel.findByIdAndDelete(_id);
       return res.send({ message: "Data is delete", data: studentData })
     }
@@ -465,6 +466,9 @@ const StudentDelete = async (req, res) => {
     console.log(error);
   }
 }
+
+
+
 
 
 module.exports = { adminSigninController, AdminStudentAdd, MultipleStudentsAdd, FacultyAdd, StudentDelete };

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const SemesterSchema = new mongoose.Schema({
     Sem: {
-        semNumber: String,
+        semNumber: Number,
         Courses: [
             {
                 course: String,
