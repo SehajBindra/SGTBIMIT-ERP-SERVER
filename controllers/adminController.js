@@ -365,7 +365,8 @@ const AdminStudentAdd = async (req, res) => {
         SubjectGet.Sem.map((value) => {
           if (value.semNumber == semester) {
             value.Subjects.Default.map(async (value) => {
-              await StudentDetails.Subjects.default.push(value._id)
+              // console.log(value);
+              await StudentDetails.Subjects.default.push(value)
             })
           }
         })

@@ -4,6 +4,7 @@ const {adminSigninController,AdminStudentAdd,MultipleStudentsAdd,FacultyAdd,Stud
 const formidable = require('express-formidable');
 const {verifyToken,isAdminsRoleCheck,isAdmin} = require("../middleware/authentication");
 const {SemesterPromote} = require("../controllers/semesterController");
+const {AllSubjectAdd,TeacherSubjectSelect} = require("../controllers/allSubjectController");
 
 //login
 router.post("/Signin", adminSigninController);
@@ -22,6 +23,12 @@ router.delete("/Student_Delete/:_id",verifyToken,isAdminsRoleCheck,StudentDelete
 
 //Semester Permote 
 router.patch("/Semester_Permote/:semNumber",SemesterPromote)
+
+//All Subject Add 
+router.post("/All_Subject_Add",AllSubjectAdd);
+
+//Teacher Subject Add
+router.post("/Teacher_Subject_Select",TeacherSubjectSelect);
 
 router.get("/admin-auth",verifyToken,isAdmin, (req,res) =>{
     return res.status(200).send({ok : true});
