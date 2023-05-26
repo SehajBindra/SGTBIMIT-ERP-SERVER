@@ -501,8 +501,8 @@ const FacultyAdd = async (req, res) => {
 
       await FacultyData.save();
       return res.status(200).send({ message: "Account has been Created" });
-    }else {
-      return res.status(500).send("Account all ready created")
+    } else {
+      return res.status(500).send("Account all ready created");
     }
   } catch (error) {
     console.log(error);
@@ -613,7 +613,10 @@ const TeacherTimeTableAdd = async (
 // Student Time Table
 const StudentTimeTable = async (req, res) => {
   try {
-    const { Course, sem, section, subject_id, Teacher_id, time } = req.body;
+    const { Course, sem, Date, section, subject_id, Teacher_id, time } =
+      req.body;
+
+      console.log(req.body);
 
     const semCheck = {
       value: "",
@@ -625,7 +628,7 @@ const StudentTimeTable = async (req, res) => {
       status: false,
     };
 
-    const SearchData = await StuTimeTable.findOne({ Course: Course });
+    const SearchData = await StuTimeTable.findOne({Course : Course,Date : Date });
 
     console.log(SearchData);
 
@@ -638,6 +641,7 @@ const StudentTimeTable = async (req, res) => {
       });
     } else {
       await StuTimeTable({
+        Date: Date,
         Course: Course,
         Sems: [
           {
@@ -656,7 +660,7 @@ const StudentTimeTable = async (req, res) => {
             ],
           },
         ],
-      }).save();
+      }).save()
       await TeacherTimeTableAdd(
         Teacher_id,
         subject_id,
@@ -677,7 +681,7 @@ const StudentTimeTable = async (req, res) => {
       });
     } else {
       await StuTimeTable.updateOne(
-        { Course: Course },
+        { Course: Course, Date: Date },
         {
           $push: {
             Sems: [
@@ -714,7 +718,7 @@ const StudentTimeTable = async (req, res) => {
 
     if (sectionCheck.status) {
       await StuTimeTable.updateOne(
-        { Course: Course },
+        { Course: Course, Date: Date },
         {
           $push: {
             "Sems.$[sem].Sections.$[section].Subjects": [
@@ -739,7 +743,7 @@ const StudentTimeTable = async (req, res) => {
       return res.send("Subject Add in Time Table");
     } else {
       await StuTimeTable.updateOne(
-        { Course: Course },
+        { Course: Course, Date: Date },
         {
           $push: {
             "Sems.$[sem].Sections": [
@@ -768,6 +772,16 @@ const StudentTimeTable = async (req, res) => {
       );
       return res.send("Subject Add in Time Table");
     }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const DataFInd = async (req, res) => {
+  try {
+    const { Course, subject_id } = req.params;
+
+    const SearchData = await StuTimeTable.findOne({ Course });
   } catch (error) {
     console.log(error);
   }
