@@ -52,7 +52,7 @@ const SemesterAdd = async (sem, course, section, id) => {
   try {
     const SearchData = await Semeters.find();
 
-    console.log(typeof sem);
+    // console.log(typeof sem);
 
     const SemesterResult = {
       data: "",

@@ -147,57 +147,109 @@ const StudentAttendance = async (req, res) => {
       time
     );
 
-    const SeachData = await StuTimeTable.findOne({
+    const SearchData = await StuTimeTable.findOne({
       Course: Course,
       Date: Date,
     });
+    // console.log(SearchData);
 
-    if (SeachData) {
-      console.log("hi");
-      SeachData.Sems.map((value) => {
-        if (value.sem == sem) {
-          console.log("hi1");
-          value.Sections.map((value) => {
-            if (value.section == section) {
-              console.log("hi2");
-              value.Subjects.map(async (value) => {
-                console.log(value);
-                if (
-                  value.subjectId == subject_id &&
-                  value.Teacher_id == Teacher_id &&
-                  value.time == time
-                ) {
-                  console.log("hi3");
-                  for(let i=0;i<student_ids.length;i++){
-                    await StuTimeTable.updateOne(
-                      { Date: Date, Course: Course },
-                      {
-                        $push: {
-                          "Sems.$[sem].Sections.$[section].Subjects.$[subject].Student_ids": [
-                            student_ids[i]
-                          ]
-                        },
-                      },
-                      {
-                        arrayFilters: [
-                          { "sem.sem": sem },
-                          { "section.section": section },
-                          { "subject.subjectId":subject_id}
-                        ]
-                      }
-                    );
-                  }
-                  return res
-                    .status(200)
-                    .send({ message: "Attendance Done", status: true });
-                }
-              });
-            }
-          });
+    const SelectedData = [];
+
+    for (let i = 0; i < student_ids.length; i++) {
+      const data = await StuTimeTable.findOne({
+        $and: [
+          { Date },
+          { Course },
+          { "Sems.Sections.Subjects.Student_ids": { $in: student_ids[i] } },
+        ],
+      });
+      if (!data) {
+        SelectedData.push(student_ids[i]);
+      }
+    }
+
+    console.log(SelectedData);
+
+    const semCheck = {
+      value: "",
+      status: false,
+    };
+
+    const sectionCheck = {
+      value: "",
+      status: false,
+    };
+
+    if (SearchData) {
+      if(SelectedData.length){
+        SearchData.Sems.map((value) => {
+          if (value.sem == sem) {
+            semCheck.status = true;
+            semCheck.value = value;
+          }
+        });
+      }else{
+        return res.send({message : "All student Attendance done"})
+      }
+    } else {
+      return res.status(404).send({ message: `Today Time Table Not found` });
+    }
+
+    if (semCheck.status) {
+      semCheck.value.Sections.map((value) => {
+        if (value.section == section) {
+          sectionCheck.value = value;
+          sectionCheck.status = true;
         }
       });
     } else {
-      return res.status(404).send("Time Table Not Found");
+      return res
+        .status(404)
+        .send({ message: `${sem} Semester Time Table Not found ` });
+    }
+
+    if (sectionCheck.status) {
+      sectionCheck.value.Subjects.map(async (value) => {
+        if (
+          value.subject_id == subject_id &&
+          value.Teacher_id == Teacher_id &&
+          value.time == time
+        ) {
+          // for(let i=0;i<student_ids.length;i++){
+          //   for(let j=0;j<value.Student_ids.length;j++){
+          //     if(student_ids[i] == value.Student_ids[j]){
+          //       await
+          //     }
+          //   }
+          // }
+
+          for (let i = 0; i < SelectedData.length; i++) {
+            await StuTimeTable.updateOne(
+              { Date: Date, Course: Course },
+              {
+                $push: {
+                  "Sems.$[sem].Sections.$[section].Subjects.$[subject].Student_ids":
+                    [SelectedData[i]],
+                },
+              },
+              {
+                arrayFilters: [
+                  { "sem.sem": sem },
+                  { "section.section": section },
+                  { "subject.subject_id": subject_id },
+                ],
+              }
+            );
+          }
+          return res
+            .status(200)
+            .send({ message: "Attendance Done", status: true });
+        }
+      });
+    } else {
+      return res
+        .status(404)
+        .send({ message: `${section} Section Time Table Not found` });
     }
   } catch (error) {
     console.log(error);
