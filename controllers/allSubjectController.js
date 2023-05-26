@@ -92,12 +92,12 @@ const AllSubjectAdd = async (req, res) => {
         const SearchData = await Subjects.findOne({ Course, Subject_Code });
 
         if (!SearchData) {
-            const SubjectData = await Subjects(req.body)
-            SubjectHandlerAdd(Course, Sem, Categories, SubjectData._id)
-            await SubjectData.save()
-            return res.status(200).send({ message: "Subject Add " })
+            const SubjectData = await Subjects(req.body);
+            SubjectHandlerAdd(Course, Sem, Categories, SubjectData._id);
+            await SubjectData.save();
+            return res.status(200).send({ message: "Subject Add " });
         } else {
-            return res.status(404).send({ message: "Subject All ready exist ", status: false })
+            return res.status(404).send({ message: "Subject All ready exist ", status: false });
         }
 
     } catch (error) {
@@ -109,7 +109,7 @@ const AllSubjectAdd = async (req, res) => {
 
 const TeacherSubjectSelect = async (req, res) => {
     try {
-        const { Sem, Course, Teacher_id, Section, Subject_Code } = req.body
+        const { Sem, Course, Teacher_id, Section, Subject_Code } = req.body;
 
         // console.log(Sem, Course, Teacher_id, Section, Subject_Code);
 
@@ -130,7 +130,7 @@ const TeacherSubjectSelect = async (req, res) => {
             })
 
             if (Detailcheck.status) {
-                return res.status(404).send("Teacher all ready exist ")
+                return res.status(404).send("Teacher all ready exist ");
             } else {
                 await Subjects.updateOne({ Course, Sem, Subject_Code }, {
                     $push: {
@@ -140,11 +140,11 @@ const TeacherSubjectSelect = async (req, res) => {
                         }]
                     }
                 })
-                return res.send("Data save")
+                return res.send("Data save");
             }
 
         } else {
-            return res.send("Data Not found")
+            return res.send("Data Not found");
         }
     } catch (error) {
         console.log('====================================');

@@ -5,10 +5,11 @@ const adminModel = require("../models/admin");
 const studentModel = require("../models/student");
 const fs = require("fs");
 const xlsx = require("xlsx");
-const Semeters = require('../models/Semester');
+const Semeters = require("../models/Semester");
 const facultyModel = require("../models/faculty");
-const Subject = require('../models/Subjects');
-
+const Subject = require("../models/Subjects");
+const StuTimeTable = require("../models/StudentTimeTable");
+const TeahTimeTable = require("../models/TeacherTimeTable");
 
 const adminSigninController = async (req, res) => {
   try {
@@ -49,25 +50,24 @@ const adminSigninController = async (req, res) => {
 
 const SemesterAdd = async (sem, course, section, id) => {
   try {
-
     const SearchData = await Semeters.find();
 
     console.log(typeof sem);
 
     const SemesterResult = {
       data: "",
-      result: false
-    }
+      result: false,
+    };
 
     const CourseResult = {
       data: "",
-      result: false
-    }
+      result: false,
+    };
 
     const SectionResult = {
       data: "",
-      result: false
-    }
+      result: false,
+    };
 
     if (SearchData.length) {
       // for(let i=0;i<SearchData.length;i++){
@@ -82,23 +82,29 @@ const SemesterAdd = async (sem, course, section, id) => {
           SemesterResult.data = value;
           SemesterResult.result = true;
         }
-      })
+      });
     } else {
       await Semeters({
         Sem: {
           semNumber: sem,
-          Courses: [{
-            course: course,
-            Sections: [{
-              section: section,
-              StudentsIDs: [{
-                stu_id: id
-              }]
-            }]
-          }]
-        }
-      }).save()
-      return
+          Courses: [
+            {
+              course: course,
+              Sections: [
+                {
+                  section: section,
+                  StudentsIDs: [
+                    {
+                      stu_id: id,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      }).save();
+      return;
     }
 
     if (SemesterResult.result) {
@@ -106,25 +112,31 @@ const SemesterAdd = async (sem, course, section, id) => {
         // console.log(value);
         if (value.course === course) {
           CourseResult.data = value;
-          CourseResult.result = true
+          CourseResult.result = true;
         }
-      })
+      });
     } else {
       await Semeters({
         Sem: {
           semNumber: sem,
-          Courses: [{
-            course: course,
-            Sections: [{
-              section: section,
-              StudentsIDs: [{
-                stu_id: id
-              }]
-            }]
-          }]
-        }
-      }).save()
-      return
+          Courses: [
+            {
+              course: course,
+              Sections: [
+                {
+                  section: section,
+                  StudentsIDs: [
+                    {
+                      stu_id: id,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      }).save();
+      return;
     }
 
     if (CourseResult.result) {
@@ -132,61 +144,89 @@ const SemesterAdd = async (sem, course, section, id) => {
       CourseResult.data.Sections.map((value) => {
         if (value.section === section) {
           SectionResult.data = value;
-          SectionResult.result = true
-        }
-      })
-    } else {
-
-      await Semeters.updateOne({ "Sem.semNumber": sem }, {
-        $push: {
-          "Sem.Courses": {
-            course: course,
-            Sections: [{
-              section: section,
-              StudentsIDs: [{
-                stu_id: id
-              }]
-            }]
-          }
+          SectionResult.result = true;
         }
       });
+    } else {
+      await Semeters.updateOne(
+        { "Sem.semNumber": sem },
+        {
+          $push: {
+            "Sem.Courses": {
+              course: course,
+              Sections: [
+                {
+                  section: section,
+                  StudentsIDs: [
+                    {
+                      stu_id: id,
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        }
+      );
 
-      return
+      return;
       // console.log(data);
     }
-
 
     if (SectionResult.result) {
       // console.log("2");
-      await Semeters.updateOne({ "Sem.semNumber": sem, "Sem.Courses.course": course, "Sem.Courses.Sections.section": section }, {
-        $push: {
-          "Sem.Courses.$[course].Sections.$[section].StudentsIDs": [{
-            stu_id: id
-          }]
+      await Semeters.updateOne(
+        {
+          "Sem.semNumber": sem,
+          "Sem.Courses.course": course,
+          "Sem.Courses.Sections.section": section,
+        },
+        {
+          $push: {
+            "Sem.Courses.$[course].Sections.$[section].StudentsIDs": [
+              {
+                stu_id: id,
+              },
+            ],
+          },
+        },
+        {
+          arrayFilters: [
+            { "course.course": course },
+            { "section.section": section },
+          ],
         }
-      }, { arrayFilters: [{ "course.course": course }, { "section.section": section }] });
-      return
+      );
+      return;
       // console.log(data);
     } else {
       // console.log("1");
-      await Semeters.updateOne({ "Sem.semNumber": sem, "Sem.Courses.course": course }, {
-        $push: {
-          "Sem.Courses.$[course].Sections": [{
-            section: section,
-            StudentsIDs: [{
-              stu_id: id
-            }]
-          }]
-        }
-      }, { arrayFilters: [{ "course.course": course }] })
+      await Semeters.updateOne(
+        { "Sem.semNumber": sem, "Sem.Courses.course": course },
+        {
+          $push: {
+            "Sem.Courses.$[course].Sections": [
+              {
+                section: section,
+                StudentsIDs: [
+                  {
+                    stu_id: id,
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        { arrayFilters: [{ "course.course": course }] }
+      );
 
-      return
+      return;
     }
-
   } catch (error) {
-    console.log(error); s
+    console.log(error);
+    s;
   }
-}
+};
 
 const MultipleStudentsAdd = async (req, res) => {
   try {
@@ -197,7 +237,6 @@ const MultipleStudentsAdd = async (req, res) => {
     const P_Json = xlsx.utils.sheet_to_json(sheet);
 
     // console.log(P_Json[0].rollnumber);
-
 
     const RejectData = [];
 
@@ -214,7 +253,10 @@ const MultipleStudentsAdd = async (req, res) => {
         if (SearchData) {
           await RejectData.push(P_Json[i]);
         } else {
-          const SubjectGet = await Subject.findOne({ Course: P_Json[i].course, Sem: { $elemMatch: { semNumber: P_Json[i].semester } } })
+          const SubjectGet = await Subject.findOne({
+            Course: P_Json[i].course,
+            Sem: { $elemMatch: { semNumber: P_Json[i].semester } },
+          });
           const StudentData = await studentModel({
             fathernumber: P_Json[i].fathernumber,
             section: P_Json[i].section,
@@ -245,13 +287,18 @@ const MultipleStudentsAdd = async (req, res) => {
             SubjectGet.Sem.map((value) => {
               if (value.semNumber == P_Json[i].semester) {
                 value.Subjects.Default.map(async (value) => {
-                  await StudentData.Subjects.default.push(value._id)
-                })
+                  await StudentData.Subjects.default.push(value._id);
+                });
               }
-            })
+            });
           }
 
-          await SemesterAdd(P_Json[i].semester, P_Json[i].course, P_Json[i].section, StudentData._id)
+          await SemesterAdd(
+            P_Json[i].semester,
+            P_Json[i].course,
+            P_Json[i].section,
+            StudentData._id
+          );
           await StudentData.save();
         }
       }
@@ -264,7 +311,6 @@ const MultipleStudentsAdd = async (req, res) => {
     } else {
       return res.status(200).send("Data successfully Add");
     }
-
   } catch (error) {
     console.log(error);
   }
@@ -343,7 +389,9 @@ const AdminStudentAdd = async (req, res) => {
     });
 
     if (StudentCheck) {
-      return res.status(401).send({ message: "Student Already registered", success: false })
+      return res
+        .status(401)
+        .send({ message: "Student Already registered", success: false });
     } else {
       const StudentDetails = await studentModel(req.fields);
 
@@ -359,47 +407,75 @@ const AdminStudentAdd = async (req, res) => {
       StudentDetails.password = hashedPassword;
       StudentDetails.batch = year;
 
-      const SubjectGet = await Subject.findOne({ Course: course, Sem: { $elemMatch: { semNumber: semester } } })
+      const SubjectGet = await Subject.findOne({
+        Course: course,
+        Sem: { $elemMatch: { semNumber: semester } },
+      });
 
       if (SubjectGet) {
         SubjectGet.Sem.map((value) => {
           if (value.semNumber == semester) {
             value.Subjects.Default.map(async (value) => {
               // console.log(value);
-              await StudentDetails.Subjects.default.push(value)
-            })
+              await StudentDetails.Subjects.default.push(value);
+            });
           }
-        })
+        });
       }
 
-      await SemesterAdd(semester, course,section, StudentDetails._id)
+      await SemesterAdd(semester, course, section, StudentDetails._id);
 
       await StudentDetails.save();
-      return res.status(200).send({ message: "Student has been Created ", success: true })
+      return res
+        .status(200)
+        .send({ message: "Student has been Created ", success: true });
     }
-
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 const FacultyAdd = async (req, res) => {
   try {
-    const { firstName, lastname, Gender, Joinyear, dob, designation, email, phone, address, Category } = req.fields;
+    const {
+      firstName,
+      lastname,
+      Gender,
+      Joinyear,
+      dob,
+      designation,
+      email,
+      phone,
+      address,
+      Category,
+    } = req.fields;
     const { avatar } = req.files;
 
-    if (!firstName || !lastname || !Gender || !Joinyear || !dob || !designation || !email || !phone || !address || !Category) {
+    if (
+      !firstName ||
+      !lastname ||
+      !Gender ||
+      !Joinyear ||
+      !dob ||
+      !designation ||
+      !email ||
+      !phone ||
+      !address ||
+      !Category
+    ) {
       return res.status(401).send({ message: "All fields are required" });
     }
 
     if (phone.length > 10 || phone.length < 10) {
-      return res.status(400).send({ message: "You have typed wrong phone number" });
+      return res
+        .status(400)
+        .send({ message: "You have typed wrong phone number" });
     }
     if (!emailValidator.validate(email)) {
       return res.status(400).send({ message: "Email is not correct" });
     }
     if (avatar && avatar.size < 1000000) {
-      return res.status(400).send({ message: "Avatar Size required 1Mb only" })
+      return res.status(400).send({ message: "Avatar Size required 1Mb only" });
     }
 
     const DataCheck = await facultyModel.findOne({ email, phone });
@@ -411,10 +487,11 @@ const FacultyAdd = async (req, res) => {
         FacultyData.avatar.data = fs.readFileSync(avatar.path);
         FacultyData.avatar.contentType = avatar.type;
         FacultyData.avatar.Name = avatar.name;
-      };
+      }
 
       switch (Category) {
-        case "Teacher": FacultyData.role = 3
+        case "Teacher":
+          FacultyData.role = 3;
       }
 
       const passwordCreate = phone + firstName;
@@ -422,35 +499,46 @@ const FacultyAdd = async (req, res) => {
       const hashedPassword = await hashPassword(passwordCreate);
       FacultyData.password = hashedPassword;
 
-
-      await FacultyData.save()
-      return res.status(200).send({ message: "Account has been Created" })
+      await FacultyData.save();
+      return res.status(200).send({ message: "Account has been Created" });
+    }else {
+      return res.status(500).send("Account all ready created")
     }
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 const StuDeleteInSem = async (Sem, cour, sect, id) => {
   try {
-    const Datafind = await Semeters.findOne({ "Sem.Courses.Sections.StudentsIDs.stu_id": id });
+    const Datafind = await Semeters.findOne({
+      "Sem.Courses.Sections.StudentsIDs.stu_id": id,
+    });
     if (Datafind) {
-      const data = await Semeters.updateOne({ "Sem.semNumber": Sem, "Sem.Courses.Sections.StudentsIDs.stu_id": id }, {
-        $pull: {
-          "Sem.Courses.$[course].Sections.$[section].StudentsIDs": {
-            stu_id: id
-          }
+      const data = await Semeters.updateOne(
+        { "Sem.semNumber": Sem, "Sem.Courses.Sections.StudentsIDs.stu_id": id },
+        {
+          $pull: {
+            "Sem.Courses.$[course].Sections.$[section].StudentsIDs": {
+              stu_id: id,
+            },
+          },
+        },
+        {
+          arrayFilters: [
+            { "course.course": cour },
+            { "section.section": sect },
+          ],
         }
-      }, { arrayFilters: [{ "course.course": cour }, { "section.section": sect }] });
+      );
 
       console.log(data);
-      return
+      return;
     }
   } catch (error) {
     console.log(error);
   }
-}
-
+};
 
 //---------------Student Delete Route-------------------- //
 
@@ -461,15 +549,235 @@ const StudentDelete = async (req, res) => {
 
     if (studentData) {
       await studentModel.findByIdAndDelete(_id);
-      return res.send({ message: "Data is delete", data: studentData })
+      return res.send({ message: "Data is delete", data: studentData });
     }
   } catch (error) {
     console.log(error);
   }
-}
+};
 
+//Teacher Time Table
+const TeacherTimeTableAdd = async (
+  Teacher_id,
+  Subject_id,
+  Course,
+  Sem,
+  Section,
+  time
+) => {
+  try {
+    console.log(Teacher_id, Subject_id, Course, Sem, Section, time);
+    const SearchData = await TeahTimeTable.findOne({ Teacher_id });
+    console.log(SearchData);
 
+    if (!SearchData) {
+      console.log("hi");
+      await TeahTimeTable({
+        Teacher_id,
+        Subjects: [
+          {
+            Subject_id,
+            Course,
+            Sem,
+            Section,
+            time,
+          },
+        ],
+      }).save();
+      console.log("hi2");
+      return;
+    } else {
+      await TeahTimeTable.updateOne(
+        { Teacher_id },
+        {
+          $push: {
+            Subjects: [
+              {
+                Subject_id,
+                Course,
+                Sem,
+                Section,
+                time,
+              },
+            ],
+          },
+        }
+      );
+      return;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
+// Student Time Table
+const StudentTimeTable = async (req, res) => {
+  try {
+    const { Course, sem, section, subject_id, Teacher_id, time } = req.body;
 
+    const semCheck = {
+      value: "",
+      status: false,
+    };
 
-module.exports = { adminSigninController, AdminStudentAdd, MultipleStudentsAdd, FacultyAdd, StudentDelete };
+    const sectionCheck = {
+      value: "",
+      status: false,
+    };
+
+    const SearchData = await StuTimeTable.findOne({ Course: Course });
+
+    console.log(SearchData);
+
+    if (SearchData) {
+      SearchData.Sems.map((value) => {
+        if (value.sem == sem) {
+          semCheck.value = value;
+          semCheck.status = true;
+        }
+      });
+    } else {
+      await StuTimeTable({
+        Course: Course,
+        Sems: [
+          {
+            sem: sem,
+            Sections: [
+              {
+                section: section,
+                Subjects: [
+                  {
+                    subject_id,
+                    Teacher_id,
+                    time,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      }).save();
+      await TeacherTimeTableAdd(
+        Teacher_id,
+        subject_id,
+        Course,
+        sem,
+        section,
+        time
+      );
+      return res.send("Subject Add in Time Table");
+    }
+
+    if (semCheck.status) {
+      semCheck.value.Sections.map((value) => {
+        if (value.section == section) {
+          sectionCheck.value = value;
+          sectionCheck.status = true;
+        }
+      });
+    } else {
+      await StuTimeTable.updateOne(
+        { Course: Course },
+        {
+          $push: {
+            Sems: [
+              {
+                sem,
+                Sections: [
+                  {
+                    section,
+                    Subjects: [
+                      {
+                        subject_id,
+                        Teacher_id,
+                        time,
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        }
+      );
+      await TeacherTimeTableAdd(
+        Teacher_id,
+        subject_id,
+        Course,
+        sem,
+        section,
+        time
+      );
+
+      return res.send("Subject Add in Time Table");
+    }
+
+    if (sectionCheck.status) {
+      await StuTimeTable.updateOne(
+        { Course: Course },
+        {
+          $push: {
+            "Sems.$[sem].Sections.$[section].Subjects": [
+              {
+                subject_id,
+                Teacher_id,
+                time,
+              },
+            ],
+          },
+        },
+        { arrayFilters: [{ "sem.sem": sem }, { "section.section": section }] }
+      );
+      await TeacherTimeTableAdd(
+        Teacher_id,
+        subject_id,
+        Course,
+        sem,
+        section,
+        time
+      );
+      return res.send("Subject Add in Time Table");
+    } else {
+      await StuTimeTable.updateOne(
+        { Course: Course },
+        {
+          $push: {
+            "Sems.$[sem].Sections": [
+              {
+                section,
+                Subjects: [
+                  {
+                    subject_id,
+                    Teacher_id,
+                    time,
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        { arrayFilters: [{ "sem.sem": sem }] }
+      );
+      await TeacherTimeTableAdd(
+        Teacher_id,
+        subject_id,
+        Course,
+        sem,
+        section,
+        time
+      );
+      return res.send("Subject Add in Time Table");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = {
+  adminSigninController,
+  AdminStudentAdd,
+  MultipleStudentsAdd,
+  FacultyAdd,
+  StudentDelete,
+  StudentTimeTable,
+};
