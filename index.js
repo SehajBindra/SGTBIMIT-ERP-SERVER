@@ -43,6 +43,10 @@ const superadminRoute = require("./routes/superAdminRoute");
 app.use("/api/superAdmin", superadminRoute);
 
 
+//Subject routes
+const SubjectRoutes = require("./routes/SubjectRoutes");
+app.use("/api/Subject",SubjectRoutes);
+
 
 
 //Admin Routes
