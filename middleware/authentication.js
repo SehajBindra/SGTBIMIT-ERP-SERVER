@@ -100,6 +100,7 @@ const isStudent = async (req,res,next) =>{
         const user = await Student.findById(req.user._id).select("role");
 
         if(user.role == 2){
+            req._id = req.user._id
             next()
         }else{
             return res.status(401).send({
@@ -111,6 +112,7 @@ const isStudent = async (req,res,next) =>{
         console.log(error);
     }
 }
+
 
 
 module.exports = {

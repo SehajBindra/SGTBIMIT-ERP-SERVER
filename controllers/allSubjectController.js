@@ -21,49 +21,54 @@ const SubjectHandlerAdd = async (Course, Sem, Categories, id) => {
                 }
             })
         } else {
-            // console.log("h1");
-            // if (Categories == "Default") {
-            // console.log("check");
-            await SubjectHandler({
-                Course: Course,
-                Sem: [{
-                    semNumber: Sem,
-                    Subjects: [id]
-                }]
-            }).save();
-            return
-            // } else if (Categories == "Optional") {
-            //     console.log("check 2");
-            //     await SubjectHandler({
-            //         Course: Course,
-            //         Sem: [{
-            //             semNumber: Sem,
-            //             Subjects: {
-            //                 Optional: [id]
-            //             }
-            //         }]
-            //     }).save();
-            //     return
-            // }
+            console.log("h1");
+            if (Categories == "Default") {
+                // console.log("check");
+                await SubjectHandler({
+                    Course: Course,
+                    Sem: [{
+                        semNumber: Sem,
+                        Subjects: {
+                            Default: [id]
+                        }
+                    }]
+                }).save();
+                return
+            } else if (Categories == "Optional") {
+                // console.log("check 2");
+                await SubjectHandler({
+                    Course: Course,
+                    Sem: [{
+                        semNumber: Sem,
+                        Subjects: {
+                            Optional: [id]
+                        }
+                    }]
+                }).save();
+                return
+            }
         }
 
 
         if (SemCheck.status) {
-            // if (Categories == "Default") {
-            await SubjectHandler.updateOne({ Course: Course, "Sem.semNumber": Sem }, {
-                $push: {
-                    "Sem.$[semNumber].Subjects": id
-                }
-            }, { arrayFilters: [{ "semNumber.semNumber": Sem }] })
-            return
-            // } else if (Categories == "Optional") {
-            //     await SubjectHandler.updateOne({ Course: Course, "Sem.semNumber": Sem }, {
-            //         $push: {
-            //             "Sem.$[semNumber].Subjects.Optional": id
-            //         }
-            //     }, { arrayFilters: [{ "semNumber.semNumber": Sem }] })
-            //     return
-            // }
+            // console.log("Check 3");
+            if (Categories == "Default") {
+                await SubjectHandler.updateOne({ Course: Course, "Sem.semNumber": Sem }, {
+                    $push: {
+                        "Sem.$[semNumber].Subjects.Default": id
+                    }
+                }, { arrayFilters: [{ "semNumber.semNumber": Sem }] })
+                return
+            }
+            else if (Categories == "Optional") {
+                // console.log("Check 4");
+                await SubjectHandler.updateOne({ Course: Course, "Sem.semNumber": Sem }, {
+                    $push: {
+                        "Sem.$[semNumber].Subjects.Optional": id
+                    }
+                }, { arrayFilters: [{ "semNumber.semNumber": Sem }] })
+                return
+            }
         }
 
     } catch (error) {

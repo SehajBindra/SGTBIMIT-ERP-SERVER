@@ -4,6 +4,7 @@ const Jwt = require("jsonwebtoken");
 const emailValidator = require("email-validator");
 const validateOTP = require("../middleware/otpvalidation");
 const Semester = require("../models/Semester");
+const StuTimeTable = require("../models/StudentTimeTable");
 
 
 //login
@@ -46,6 +47,7 @@ const studentSigninController = async (req, res) => {
     });
   }
 };
+
 
 
 
@@ -150,11 +152,95 @@ exports.postOTP = async (req, res, next) => {
 };
 
 
+//Student Data Display 
+const StudentDataDetail = async (req, res) => {
+  try {
+    const DataCheck = await studentModel.findById(req._id).select("firstname lastname batch course rollnumber address phone email section semester");
+    if (DataCheck) {
+      return res.status(200).send(DataCheck)
+    } else {
+      return res.status(500).send("Data not exist")
+    }
 
+  } catch (error) {
+    console.log('====================================');
+    console.log(error);
+    console.log('====================================');
+  }
+}
+
+//Student Image Get 
+const StudentImageGet = async (req, res) => {
+  try {
+    const { _id } = req.params;
+    const Data = await studentModel.findById(_id, { avatar: 1 });
+    if (Data) {
+      res.set("Content-type", Data.avatar.contentType);
+      return res.status(200).send(Data.avatar.data);
+    }
+  } catch (error) {
+    console.log('====================================');
+    console.log(error);
+    console.log('====================================');
+  }
+}
+
+
+const StudentTimeTableGet = async (req, res) => {
+  try {
+    const { Date, Course, Semester, section } = req.body.Detail;
+    console.log(req.body);
+
+    const SearchData = await StuTimeTable.findOne({ Date, Course }, { "Sems.Sections.Subjects.Student_ids": 0 }).populate("Sems.Sections.Subjects.subject_id", "_id Subject_Code Subject_Name").populate("Sems.Sections.Subjects.Teacher_id", "_id firstName lastName");
+
+    const SemesterCheck = {
+      data: "",
+      status: false
+    }
+
+    const SectionCheck = {
+      data: "",
+      status: false
+    }
+
+    if (SearchData) {
+      SearchData.Sems.map((value) => {
+        if (value.sem == Semester) {
+          SemesterCheck.data = value;
+          SemesterCheck.status = true
+        }
+      })
+    } else {
+      return res.send({ message: "Today Time Table Not Found", status: false });
+    }
+
+    if (SemesterCheck.status) {
+      SemesterCheck.data.Sections.map((value) => {
+        if (value.section == section) {
+          SectionCheck.data = value
+          SectionCheck.status = true
+          return res.status(200).send(value.Subjects);
+        }
+      })
+    } else {
+      return res.send({ message: `Today ${Semester} Semester Time Table Not Found`, status: false });
+    }
+
+    if (!SectionCheck.status) {
+      return res.send({ message: `Today ${Semester} Semester Section ${section} Time Table Not Found`, status: false })
+    }
+  } catch (error) {
+    console.log('====================================');
+    console.log(error);
+    console.log('====================================');
+  }
+}
 
 
 module.exports = {
   studentSigninController,
   studentUpdateController,
- 
+  StudentDataDetail,
+  StudentImageGet,
+  StudentTimeTableGet
 };

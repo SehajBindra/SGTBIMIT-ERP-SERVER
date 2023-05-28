@@ -5,12 +5,20 @@ const SubjectSchema = new mongoose.Schema({
     Sem: [
         {
             semNumber: Number,
-            Subjects: [
-                {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "allsubject"
-                }
-            ]
+            Subjects: {
+                Default: [
+                    {
+                        Subject_Name: String,
+                        Subject_Code: Number
+                    }
+                ],
+                Optional: [
+                    {
+                        Subject_Name: String,
+                        Subject_Code: Number
+                    }
+                ]
+            }
         }
     ]
 

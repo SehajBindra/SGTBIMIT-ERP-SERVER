@@ -411,6 +411,7 @@ const AdminStudentAdd = async (req, res) => {
         Course: course,
         Sem: { $elemMatch: { semNumber: semester } },
       });
+      console.log(SubjectGet);
 
       if (SubjectGet) {
         SubjectGet.Sem.map((value) => {
